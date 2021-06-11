@@ -1,0 +1,27 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cagneymoreau.fitlog.MainActivity">
+
+
+    <item
+        android:id="@+id/settings_menu"
+        android:orderInCategory="110"
+        android:title="Settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/data_backup_menu"
+        android:orderInCategory="120"
+        android:title="Data Policy"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/trophies_menu"
+        android:orderInCategory="130"
+        android:title="Trophy Case"
+        app:showAsAction="never" />
+
+
+</menu>

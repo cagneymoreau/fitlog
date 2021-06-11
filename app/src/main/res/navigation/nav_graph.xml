@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/main_Menu_Fragment">
+
+    <fragment
+        android:id="@+id/main_Menu_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Main_Menu_Fragment"
+        android:label="Main_Menu_Fragment" >
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_routine_Builder_Fragment"
+            app:destination="@id/split_Chooser_Fragment" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_split_Chooser_Fragment"
+            app:destination="@id/day_Chooser_Fragment" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_body_Measure"
+            app:destination="@id/body_Measure" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_statistics"
+            app:destination="@id/statistics" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_settings_Fragment"
+            app:destination="@id/settings_Fragment" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_checkList_Chooser_Fragment"
+            app:destination="@id/checkList_Chooser_Fragment" />
+        <action
+            android:id="@+id/action_main_Menu_Fragment_to_history"
+            app:destination="@id/history" />
+    </fragment>
+    <fragment
+        android:id="@+id/checkList_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.CheckList_Chooser"
+        android:label="CheckList_Chooser_Fragment" >
+        <action
+            android:id="@+id/action_checkList_Chooser_Fragment_to_checkList_Edit_Fragment"
+            app:destination="@id/checkList_Edit_Fragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/split_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Split_Chooser_Fragment"
+        android:label="Split_Chooser_Fragment">
+        <action
+            android:id="@+id/action_split_Chooser_Fragment_to_split_Edit_Fragment"
+            app:destination="@id/split_Edit_Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/day_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Day_Chooser_Fragment"
+        android:label="Day_Chooser_Fragment">
+        <action
+            android:id="@+id/action_day_Chooser_Fragment_to_workout_Holder_Fragment"
+            app:destination="@id/workout_Holder_Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/body_Measure"
+        android:name="com.cagneymoreau.fitlog.fragments.Body_Measure"
+        android:label="Body_Measure" />
+    <fragment
+        android:id="@+id/statistics"
+        android:name="com.cagneymoreau.fitlog.fragments.Statistics"
+        android:label="Statistics" />
+    <fragment
+        android:id="@+id/split_Edit_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Split_Edit_Fragment"
+        android:label="Split_Edit_Fragment" />
+    <fragment
+        android:id="@+id/settings_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Settings_Fragment"
+        android:label="Settings_Fragment" />
+    <action
+        android:id="@+id/action_global_settings_Fragment"
+        app:destination="@id/settings_Fragment" />
+    <fragment
+        android:id="@+id/checkList_Edit_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.checkList_Edit_Fragment"
+        android:label="checkList_Edit_Fragment" />
+    <fragment
+        android:id="@+id/workout_Holder_Fragment"
+        android:name="com.cagneymoreau.fitlog.fragments.Workout_Holder_Fragment"
+        android:label="Workout_Holder_Fragment" />
+    <fragment
+        android:id="@+id/history"
+        android:name="com.cagneymoreau.fitlog.fragments.Existing_Workout_Picker"
+        android:label="History" >
+        <action
+            android:id="@+id/action_history_to_workout_Holder_Fragment"
+            app:destination="@id/workout_Holder_Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dataBackup"
+        android:name="com.cagneymoreau.fitlog.fragments.DataBackup"
+        android:label="DataBackup" />
+    <action
+        android:id="@+id/action_global_dataBackup"
+        app:destination="@id/dataBackup" />
+    <fragment
+        android:id="@+id/trophies"
+        android:name="com.cagneymoreau.fitlog.fragments.Trophies"
+        android:label="Trophies" />
+    <action
+        android:id="@+id/action_global_trophies"
+        app:destination="@id/trophies" />
+
+</navigation>

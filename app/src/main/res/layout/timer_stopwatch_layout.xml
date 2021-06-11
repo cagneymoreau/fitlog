@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <Button
+        android:id="@+id/startStopWatch_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:text="0:00"
+        android:id="@+id/stopwatchTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/startStopWatch_Button"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/createTimer_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/startStopWatch_Button"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/executeTimer_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/createTimer_Button"/>
+
+    <TextView
+        android:id="@+id/delay_textView"
+        android:text="delay in sec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/executeTimer_Button"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <NumberPicker
+        android:id="@+id/delay_Numberpicker"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/delay_textView"
+        app:layout_constraintEnd_toEndOf="@+id/delay_textView"/>
+
+    <TextView
+        android:id="@+id/count_TextView"
+        android:text="x count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/delay_Numberpicker"
+        app:layout_constraintTop_toTopOf="@id/delay_Numberpicker"/>
+
+    <NumberPicker
+        android:id="@+id/count_Numberpicker"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/count_TextView"
+        app:layout_constraintTop_toTopOf="@id/count_TextView"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/timer_RecycleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/count_Numberpicker"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

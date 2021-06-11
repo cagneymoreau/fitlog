@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Button
+        android:id="@+id/checkList_build_edit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Build/Edit CheckList"
+        app:layout_constraintTop_toTopOf="@+id/parent"
+
+        />
+    <TextView
+        android:id="@+id/current_checkList_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/current"
+        app:layout_constraintTop_toBottomOf="@id/checkList_build_edit_button"/>
+    <Button
+        android:id="@+id/split_Build_Edit_Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Build/Edit Split"
+        app:layout_constraintTop_toBottomOf="@id/current_checkList_textView"
+        />
+    <TextView
+        android:id="@+id/current_split_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/current"
+        app:layout_constraintTop_toBottomOf="@id/split_Build_Edit_Button"/>
+    <Button
+        android:id="@+id/start_workout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Workout"
+        app:layout_constraintTop_toBottomOf="@id/current_split_textView"
+        />
+    <Button
+        android:id="@+id/history_Button"
+        android:text="history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/body_measurement_button"
+        />
+    <Button
+        android:id="@+id/body_measurement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Body Measurements"
+        app:layout_constraintBottom_toTopOf="@+id/statistics_button"
+        />
+    <Button
+        android:id="@+id/statistics_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Statistics"
+        app:layout_constraintBottom_toBottomOf="@+id/parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

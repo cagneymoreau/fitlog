@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FitLog</string>
+    <string name="current">Current: </string>
+    <string name="none_select">none selected</string>
+    <string name="split_builder_directions"> Long press to choose a split or short press to open it</string>
+    <string name="body_measure">Keep some body measurement records</string>
+    <string name="check_list">Use checklists or notes before/after workout</string>
+    <string name="statistics">Attempt to build statistics from input data</string>
+
+</resources>
