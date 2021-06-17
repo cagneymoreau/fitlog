@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // TODO: 5/17/2021 split screen button
+// TODO: 6/16/2021 alternating workouts or split days should be single advice but need to be handled anyways
 
 /**
  * 05/10/21

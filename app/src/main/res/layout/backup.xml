@@ -4,15 +4,25 @@
     android:layout_height="match_parent">
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/easyHist_curated_recycleView"
+
+    <EditText
+        android:id="@+id/backup_EditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+
+    <TextView
+        android:id="@+id/backup_TextView"
+        android:text="data policy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/easyHist_recent_recyclview"
+        android:id="@+id/backup_recycleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
 
 
 

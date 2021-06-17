@@ -39,4 +39,7 @@ public class UserProfile {
     @ColumnInfo(name = "backups")
     public ArrayList<Triple<Long,Long, Boolean>> backups;
 
+    @ColumnInfo(name = "timers")
+    public ArrayList<Pair<Integer, Integer>> timers;
+
 }

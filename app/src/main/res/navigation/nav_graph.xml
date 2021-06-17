@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/main_Menu_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Main_Menu_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.Main_Menu_Fragment"
         android:label="Main_Menu_Fragment" >
         <action
             android:id="@+id/action_main_Menu_Fragment_to_routine_Builder_Fragment"
@@ -29,11 +29,11 @@
             app:destination="@id/checkList_Chooser_Fragment" />
         <action
             android:id="@+id/action_main_Menu_Fragment_to_history"
-            app:destination="@id/history" />
+            app:destination="@id/ExistingPicker" />
     </fragment>
     <fragment
         android:id="@+id/checkList_Chooser_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.CheckList_Chooser"
+        android:name="com.cagneymoreau.fitlog.views.checklist_design.CheckList_Chooser"
         android:label="CheckList_Chooser_Fragment" >
         <action
             android:id="@+id/action_checkList_Chooser_Fragment_to_checkList_Edit_Fragment"
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/split_Chooser_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Split_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.split_design.Split_Chooser_Fragment"
         android:label="Split_Chooser_Fragment">
         <action
             android:id="@+id/action_split_Chooser_Fragment_to_split_Edit_Fragment"
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/day_Chooser_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Day_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.Day_Chooser_Fragment"
         android:label="Day_Chooser_Fragment">
         <action
             android:id="@+id/action_day_Chooser_Fragment_to_workout_Holder_Fragment"
@@ -58,49 +58,49 @@
     </fragment>
     <fragment
         android:id="@+id/body_Measure"
-        android:name="com.cagneymoreau.fitlog.fragments.Body_Measure"
+        android:name="com.cagneymoreau.fitlog.views.Body_Measure"
         android:label="Body_Measure" />
     <fragment
         android:id="@+id/statistics"
-        android:name="com.cagneymoreau.fitlog.fragments.Statistics"
+        android:name="com.cagneymoreau.fitlog.views.Statistics"
         android:label="Statistics" />
     <fragment
         android:id="@+id/split_Edit_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Split_Edit_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.split_design.Split_Edit_Fragment"
         android:label="Split_Edit_Fragment" />
     <fragment
         android:id="@+id/settings_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Settings_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.setting_utility.Settings_Fragment"
         android:label="Settings_Fragment" />
     <action
         android:id="@+id/action_global_settings_Fragment"
         app:destination="@id/settings_Fragment" />
     <fragment
         android:id="@+id/checkList_Edit_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.checkList_Edit_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.checklist_design.checkList_Edit_Fragment"
         android:label="checkList_Edit_Fragment" />
     <fragment
         android:id="@+id/workout_Holder_Fragment"
-        android:name="com.cagneymoreau.fitlog.fragments.Workout_Holder_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.Workout_Holder_Fragment"
         android:label="Workout_Holder_Fragment" />
     <fragment
-        android:id="@+id/history"
-        android:name="com.cagneymoreau.fitlog.fragments.Existing_Workout_Picker"
-        android:label="History" >
+        android:id="@+id/ExistingPicker"
+        android:name="com.cagneymoreau.fitlog.views.Existing_Workout_Picker"
+        android:label="ExistingPicker">
         <action
             android:id="@+id/action_history_to_workout_Holder_Fragment"
             app:destination="@id/workout_Holder_Fragment" />
     </fragment>
     <fragment
         android:id="@+id/dataBackup"
-        android:name="com.cagneymoreau.fitlog.fragments.DataBackup"
+        android:name="com.cagneymoreau.fitlog.views.setting_utility.DataBackup"
         android:label="DataBackup" />
     <action
         android:id="@+id/action_global_dataBackup"
         app:destination="@id/dataBackup" />
     <fragment
         android:id="@+id/trophies"
-        android:name="com.cagneymoreau.fitlog.fragments.Trophies"
+        android:name="com.cagneymoreau.fitlog.views.setting_utility.Trophies"
         android:label="Trophies" />
     <action
         android:id="@+id/action_global_trophies"

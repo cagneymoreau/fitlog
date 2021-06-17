@@ -15,15 +15,13 @@ import com.cagneymoreau.fitlog.data.UserProfile;
 import com.cagneymoreau.fitlog.data.UserProfileDao;
 import com.cagneymoreau.fitlog.data.WorkoutRecord;
 import com.cagneymoreau.fitlog.data.WorkoutRecordDao;
-import com.cagneymoreau.fitlog.fragments.MyFragment;
+import com.cagneymoreau.fitlog.views.MyFragment;
+import com.cagneymoreau.fitlog.views.history_viewer.recycleview.HistoryItem;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Period;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +31,7 @@ import kotlin.Triple;
 /**
  * Fetch and organize data from storage
  *
- * None of these methods are available on UI thread and mu be called with
+ * None of these methods are available on UI thread
  *
  * // TODO: 5/27/2021 should the UIfrag or the cotroller hold the editable
  *  // TODO: 5/27/2021 if sort is called while editing it would start editing wrong area
@@ -212,6 +210,15 @@ public class Controller {
         return new ArrayList<>(user.get(0).trophies);
     }
 
+    public ArrayList<Pair<Integer, Integer>> getTimers()
+    {
+        return new ArrayList<>(user.get(0).timers);
+    }
+
+    public void setAllTimers(ArrayList<Pair<Integer, Integer>> tList)
+    {
+        user.get(0).timers = new ArrayList<>(tList);
+    }
 
     //backups
 
@@ -222,7 +229,9 @@ public class Controller {
         //user.get(0).backups.add(bu);
 
         //first time user is using app, backdate it 60 seconds and create a new records
-        if (user.get(0).backups != null && user.get(0).backups.size() != 0) {
+        if (user.get(0).backups == null || user.get(0).backups.size() == 0) {
+
+            user.get(0). backups = new ArrayList<>();
 
             user.get(0).backups.add(generateNewMonth(System.currentTimeMillis() - (1000 * 60)));
 
@@ -249,11 +258,11 @@ public class Controller {
     private Triple<Long, Long, Boolean> generateNewMonth(Long prevMonthEnd)
     {
 
-        LocalDate startSearch = Instant.ofEpochMilli(prevMonthEnd + (1000 * 60 *60*36)).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate startSearch = Instant.ofEpochMilli(prevMonthEnd - (1000 * 60 *60*36)).atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate lastDay = startSearch.withDayOfMonth(startSearch.lengthOfMonth());
-        LocalDateTime end = LocalDateTime.of(lastDay.getYear(), lastDay.getMonth(), lastDay.getDayOfMonth(), 23, 59, 59,999);
+        LocalDateTime end = LocalDateTime.of(lastDay.getYear(), lastDay.getMonth(), lastDay.getDayOfMonth(), 23, 59, 59);
 
-        Long input = end.toEpochSecond(ZoneOffset.UTC);
+        Long input = end.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         Triple<Long, Long, Boolean> newMonth = new Triple<>(prevMonthEnd + 1, input,false);
 
@@ -663,7 +672,7 @@ public class Controller {
     //endregion
 
     /**
-     * The workoutRecord Object is the only active version so no
+     * The workoutRecord Object is the only active version
      */
     //region-------------------- workout record
 
@@ -672,6 +681,16 @@ public class Controller {
 
     WorkoutRecord workoutRecord;
 
+
+    public String getCurrentDayName()
+    {
+        return workoutRecord.dayName;
+    }
+
+    public String getCurrentSplitName()
+    {
+        return workoutRecord.splitName;
+    }
 
     public void getRecentWorkoutDesc(MyFragment myFragment)
     {
@@ -713,18 +732,66 @@ public class Controller {
     }
 
 
-    public void openExistingWOrkoutRecord(int uid)
+    public WorkoutRecord openExistingWorkoutRecord(int uid)
     {
+        return workoutRecordDao.getRecordbyUID(uid);
+    }
 
+
+    /**
+     * @return a list of records in order of most recent with
+     *          daynames and splits matching
+     */
+    public ArrayList<HistoryItem> getCuratedList()
+    {
+        ArrayList<WorkoutRecord> records = (ArrayList<WorkoutRecord>) workoutRecordDao.getCurated(workoutRecord.dayName, workoutRecord.splitName);
+
+        ArrayList<HistoryItem> rList = new ArrayList<>();
+
+        for (int i = 0; i < records.size(); i++) {
+            HistoryItem h = new HistoryItem();
+            h.uid = records.get(i).uid;
+            h.dayName = records.get(i).dayName;
+            h.splitName = records.get(i).splitName;
+            h.date = LocalDate.ofEpochDay(records.get(i).uid);
+
+            rList.add(h);
+        }
+
+        return rList;
+
+    }
+
+    /**
+     * @return up to the last 30 chrono workouts
+     */
+    public ArrayList<HistoryItem> getRecentList()
+    {
+        long start = System.currentTimeMillis();
+        long end = start - (1000L*60L*60L*24L*60L); //30 days
+
+        ArrayList<WorkoutRecord> records = (ArrayList<WorkoutRecord>) workoutRecordDao.getSelection(start, end);
+
+        ArrayList<HistoryItem> rList = new ArrayList<>();
+
+        for (int i = 0; i < records.size(); i++) {
+            HistoryItem h = new HistoryItem();
+            h.uid = records.get(i).uid;
+            h.dayName = records.get(i).dayName;
+            h.splitName = records.get(i).splitName;
+            h.date = LocalDate.ofEpochDay(records.get(i).uid);
+
+            rList.add(h);
+        }
+
+        return rList;
     }
 
 
     /**
      * Dont save to database here in case user backs up from a mistake
-     * @param split
-     * @param dayName
      */
-    public void createNewWorkoutRecord(String split, String dayName)
+    public void createNewWorkoutRecord(int dayPos)
     {
         workoutRecord = new WorkoutRecord();
 
@@ -732,14 +799,27 @@ public class Controller {
 
         workoutRecord.datetime = System.currentTimeMillis();
 
-        workoutRecord.splitName = split;
+        workoutRecord.splitName = splitsList.get(0).splitName;
 
-        workoutRecord.dayName = dayName;
+        workoutRecord.dayName = getSpecificSplitEditable(0).get(dayPos).get(0);
+
+        placeWorkoutIntoBackups(workoutRecord.datetime);
+
+        ArrayList<ArrayList<String>> workouts = new ArrayList<>();
+
+        for (int i = 0; i < getSpecificSplitEditable(0).get(dayPos).size(); i++) {
+            ArrayList<String> n = new ArrayList<>();
+            n.add(getSpecificSplitEditable(0).get(dayPos).get(i));
+            workouts.add(n);
+        }
+
+        workoutRecord.workout = workouts;
 
         // TODO: 6/7/2021 sql insert
 
-        placeWorkoutIntoBackups(workoutRecord.datetime);
+
     }
+
 
     //checklist initial grab and update
     public ArrayList<Pair<String, Boolean>> getCheckList()
@@ -747,10 +827,12 @@ public class Controller {
         return workoutRecord.checkList;
     }
 
+    
     public String getNotes()
     {
         return workoutRecord.notes;
     }
+
 
     public void updateCheckList(ArrayList<Pair<String, Boolean>> checkList, String notes)
     {
@@ -763,11 +845,10 @@ public class Controller {
 
     public ArrayList<ArrayList<String>> getCurrentWorkout()
     {
-        return workoutRecord.workout;
+        return new ArrayList<>(workoutRecord.workout);
     }
 
     /**
-     *
      * @param updates
      */
     public void updatecurrentWorkout(ArrayList<ArrayList<String>> updates)
@@ -794,9 +875,10 @@ public class Controller {
 
     //region--------------------------backup/file building etc
 
+    //return records between two dates
     public ArrayList<WorkoutRecord> getMatchingWorkoutRecords(long start, long end)
     {
-
+        return (ArrayList<WorkoutRecord>) workoutRecordDao.getSelection(start, end);
     }
 
 

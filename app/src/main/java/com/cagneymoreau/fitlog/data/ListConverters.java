@@ -61,8 +61,9 @@ public class ListConverters {
         return json;
     }
 
+
     @TypeConverter
-    public static ArrayList<Pair<String, Boolean>> fromStringFour(String dbString)
+    public static ArrayList<Integer> fromStringFour(String dbString)
     {
         Type listType = new TypeToken<ArrayList<Integer>>() {}.getType();
         return new Gson().fromJson(dbString, listType);
@@ -91,5 +92,24 @@ public class ListConverters {
         String json = gson.toJson(list);
         return json;
     }
+
+
+    @TypeConverter
+    public static ArrayList<Pair<Integer, Integer>> fromStringSix(String dbString)
+    {
+        Type listType = new TypeToken<ArrayList<Pair<Integer, Integer>>>() {}.getType();
+        return new Gson().fromJson(dbString, listType);
+    }
+
+    @TypeConverter
+    public static String  fromIntPairList(ArrayList<Pair<Integer, Integer>> list)
+    {
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        return json;
+    }
+
+
+
 
 }
