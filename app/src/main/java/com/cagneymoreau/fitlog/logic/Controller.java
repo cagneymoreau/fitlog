@@ -827,7 +827,7 @@ public class Controller {
         return workoutRecord.checkList;
     }
 
-    
+
     public String getNotes()
     {
         return workoutRecord.notes;
