@@ -5,11 +5,7 @@
     tools:context="com.cagneymoreau.fitlog.MainActivity">
 
 
-    <item
-        android:id="@+id/settings_menu"
-        android:orderInCategory="110"
-        android:title="Settings"
-        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/data_backup_menu"
@@ -17,11 +13,7 @@
         android:title="Data Policy"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/trophies_menu"
-        android:orderInCategory="130"
-        android:title="Trophy Case"
-        app:showAsAction="never" />
+
 
 
 </menu>

@@ -15,13 +15,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.cagneymoreau.fitlog.logic.Controller;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// TODO: 5/17/2021 split screen button
-// TODO: 6/16/2021 alternating workouts or split days should be single advice but need to be handled anyways
+
 
 /**
  * 05/10/21
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //load the controller and once done display the menu
-    //this gaurantees are controller class is built in advance of the menu
+    //this gaurantees our controller class is built in advance of the menu
     private void buildDisplayDataBase()
     {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -83,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
     // UI access to controller for data etc
     public Controller getConroller()
     {
@@ -96,25 +99,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openMenuItem(int id)
     {
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.settings_menu) {
-
-            view = getWindow().getDecorView().getRootView();
-            Navigation.findNavController(this, R.id.fragment).navigate(R.id.action_global_settings_Fragment);
-
-        }
-        else if(id == R.id.data_backup_menu)
+       if(id == R.id.data_backup_menu)
         {
             view = getWindow().getDecorView().getRootView();
             Navigation.findNavController(this, R.id.fragment).navigate(R.id.action_global_dataBackup);
 
         }
-        else if(id == R.id.trophies_menu)
-        {
-            view = getWindow().getDecorView().getRootView();
-            Navigation.findNavController(this, R.id.fragment).navigate(R.id.action_global_trophies);
 
-        }
 
     }
 
@@ -123,6 +114,25 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        controller.saveUserToDB();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (controller != null){
+            controller.getSubscription().checkPurchase();
+        }
+    }
+
+
+    //endregion
 
 
 

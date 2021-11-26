@@ -8,10 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.R;
-import com.cagneymoreau.fitlog.views.checklist_design.recycleview.CheckList_ViewHolder;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class History_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -35,6 +33,7 @@ public class History_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
        viewHolder = new History_Summary_ViewHolder(v);
 
         return viewHolder;
+
     }
 
     @Override
@@ -49,4 +48,20 @@ public class History_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemCount() {
         return data.size();
     }
+
+
+    public void removeItem(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(HistoryItem item, int position) {
+        data.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public ArrayList<HistoryItem> getData() {
+        return data;
+    }
+
 }

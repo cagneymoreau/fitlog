@@ -1,6 +1,7 @@
 package com.cagneymoreau.fitlog.views.active_workout.recycleview;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ public class ActiveWorkout_ViewHolder extends RecyclerView.ViewHolder {
     TextView title;
     View view;
     ArrayList<String> mList;
+    Button button;
 
     RecyclerView recyclerView;
     Movement_Adapter adapter;
@@ -31,6 +33,7 @@ public class ActiveWorkout_ViewHolder extends RecyclerView.ViewHolder {
         this.active_workout = active_workout;
 
         title = itemView.findViewById(R.id.activeWorkoutTitle_TextView);
+        button = itemView.findViewById(R.id.freestyle_button);
         view = itemView;
 
     }
@@ -40,19 +43,39 @@ public class ActiveWorkout_ViewHolder extends RecyclerView.ViewHolder {
     {
        mList = new ArrayList<>(list);
 
+       button.setText("+ add");
+       button.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               active_workout.insertFreeStyle(position);
+           }
+       });
+
        title.setText(mList.get(0));
        mList.remove(0);
+
+       title.setOnLongClickListener(new View.OnLongClickListener() {
+           @Override
+           public boolean onLongClick(View v) {
+               active_workout.changeMoveName(position);
+               return false;
+           }
+       });
 
         recyclerView = itemView.findViewById(R.id.movement_recycleView);
         layoutManager = new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new Movement_Adapter(mList, active_workout, position);
+        adapter = new Movement_Adapter(mList, active_workout, position, this);
         recyclerView.setAdapter(adapter);
+        scrollRight();
 
     }
 
 
-
+    public void scrollRight()
+    {
+        recyclerView.smoothScrollToPosition(mList.size());
+    }
 
 }

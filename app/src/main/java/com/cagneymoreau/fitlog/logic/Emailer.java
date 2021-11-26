@@ -56,13 +56,18 @@ public class Emailer {
     ArrayList<File> fileList;
 
 
-    public Emailer(ArrayList<File> fileList)
+    public Emailer(ArrayList<File> fileList, Context context, Controller c)
     {
+        mContext = context;
+
+        controller = c;
+        recipientOfEmail[0] = controller.getEmail();
+
         subjectOfEmail = fileList.get(0).getName() + " through " + fileList.get(fileList.size()-1).getName();
 
         this.fileList = fileList;
 
-        // TODO: 6/14/2021 we sent our first email. ask for rating and provide trophy
+
 
     }
 
@@ -98,7 +103,7 @@ public class Emailer {
             ArrayList<Uri> arr = new ArrayList<>();
 
         for (int j = 0; j < files.size(); j++) {
-            Uri uri = FileProvider.getUriForFile(mContext, "ccom.cagneymoreau.simpletimekeeper.fileprovider", files.get(j));
+            Uri uri = FileProvider.getUriForFile(mContext, "com.cagneymoreau.fitlog.fileprovider", files.get(j));
             arr.add(uri);
         }
             i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, arr);

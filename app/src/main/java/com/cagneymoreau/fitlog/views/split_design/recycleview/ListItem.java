@@ -40,5 +40,11 @@ public class ListItem {
         return "error";
     }
 
+    public boolean isField()
+    {
+        return myType.equals(type.FIELD);
+
+
+    }
 
 }

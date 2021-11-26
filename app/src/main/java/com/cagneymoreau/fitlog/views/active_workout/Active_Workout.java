@@ -11,12 +11,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.MainActivity;
 import com.cagneymoreau.fitlog.R;
 import com.cagneymoreau.fitlog.logic.Controller;
+import com.cagneymoreau.fitlog.views.Description_Dialog;
+import com.cagneymoreau.fitlog.views.MyFragment;
 import com.cagneymoreau.fitlog.views.active_workout.recycleview.Active_Workout_Adapter;
 import com.cagneymoreau.fitlog.logic.RecyclerTouchListener;
 
@@ -29,10 +32,12 @@ import java.util.ArrayList;
  * Display composed of a recycleview
  *
  */
-// TODO: 6/15/2021 deletes the data on next
-// TODO: 6/15/2021 doesnt hide keyboard on next
 
-public class Active_Workout extends Fragment {
+    // TODO: 6/15/2021 deletes the data on next
+    // TODO: 6/15/2021 doesnt hide keyboard on next
+
+
+public class Active_Workout extends MyFragment {
 
     public static final String TAG = "Active_Workout";
 
@@ -47,6 +52,17 @@ public class Active_Workout extends Fragment {
     Active_Workout_Adapter active_workout_adapter;
     RecyclerView.LayoutManager layoutManager;
 
+    TextView titleTv, bottomTv;
+    ArrayList<String> title;
+
+    boolean constructed = false;
+
+    MyFragment parent = this;
+
+
+    int noItem = -4;
+    int toEdit = noItem;
+
 
     @Nullable
     @Override
@@ -54,10 +70,24 @@ public class Active_Workout extends Fragment {
 
         fragView = inflater.inflate(R.layout.chooser, container, false);
 
-
         MainActivity mainActivity = (MainActivity) getActivity();
 
         controller = mainActivity.getConroller();
+
+        titleTv = fragView.findViewById(R.id.chooser_title_textView);
+        float sd = getResources().getDisplayMetrics().scaledDensity;
+        titleTv.setTextSize((titleTv.getTextSize()/sd) * 1.2f);
+        titleTv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                toEdit = -1;
+                new Description_Dialog("Rename Workout?", titleTv.getText().toString(), parent, false).show(getChildFragmentManager(), " Edit title Dialog");
+                return false;
+            }
+        });
+
+        bottomTv = fragView.findViewById(R.id.chooser_textView);
+        bottomTv.setText("Enter your workout data");
 
         buildRecycleView();
 
@@ -67,24 +97,39 @@ public class Active_Workout extends Fragment {
 
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if (constructed) deconstruct();
 
     }
 
+
     @Override
-    public void onPause() {
-        super.onPause();
-        // TODO: 6/16/2021 save workout data
+    public void onDestroy() {
+        super.onDestroy();
+
+        pullEdits();
+      if (constructed) deconstruct();
+        // TODO: 11/9/2021 update checlist
+
+        controller.updatecurrentWorkout(currentWorkout);
+
     }
 
     private void buildRecycleView()
     {
+        constructed = true;
 
         debug = fragView.findViewById(R.id.chooser_textView);
-        debug.setText("go");
+        //debug.setText("debug.delete me");
 
         currentWorkout = controller.getCurrentWorkout();
+
+        title = currentWorkout.get(0);
+        currentWorkout.remove(0);
+        titleTv.setText(title.get(0));
+
 
         for (int i = 0; i < currentWorkout.size(); i++) {
             currentWorkout.get(i).add("");
@@ -102,36 +147,38 @@ public class Active_Workout extends Fragment {
             @Override
             public void onClick(View view, int position, float x, float y) {
                 //nothing happens here
-                Log.d(TAG, "onClick: " + position); // TODO: 6/15/2021 remove
-
+                //Log.d(TAG, "onClick: " + position); // TODO: 6/15/2021 remove
             }
 
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-
-
             }
 
-            @Override
-            public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-
-            }
         }));
 
 
     }
 
+    private void deconstruct()
+    {
+        constructed = false;
+
+        for (int i = 0; i < currentWorkout.size(); i++) {
+            currentWorkout.get(i).remove(currentWorkout.get(i).size()-1);
+        }
+        editors.clear();
+        currentWorkout.add(0, title);
+    }
 
 
     public void newEntry(int whichList)
     {
         currentWorkout.get(whichList).add("");
         pullEdits();
-        for (int i = 0; i < editors.size(); i++) {
-            editors.get(i).clear();
-        }
-        active_workout_adapter.notifyDataSetChanged();
+        updateDataSet();
+
+        controller.updatecurrentWorkout(currentWorkout);
 
     }
 
@@ -151,5 +198,51 @@ public class Active_Workout extends Fragment {
 
         }
     }
+
+
+    public void insertFreeStyle(int pos)
+    {
+        ArrayList<String> free = new ArrayList<>();
+        free.add("freestyle");
+        free.add("");
+        currentWorkout.add(pos+1, free);
+        editors.add(pos+1, new ArrayList<>());
+        updateDataSet();
+
+    }
+
+    public void changeMoveName(int pos)
+    {   toEdit = pos;
+        new Description_Dialog("Rename Movement?", currentWorkout.get(pos).get(0), parent, false).show(getChildFragmentManager(), " Edit title Dialog");
+
+    }
+
+
+    @Override
+    public void sendDialogResult(String result) {
+
+        if (toEdit < 0){
+            titleTv.setText(result);
+        }else{
+            currentWorkout.get(toEdit).set(0, result);
+        }
+
+        updateDataSet();
+
+        toEdit = noItem;
+    }
+
+    /**
+     * You must clear editors because updating the dataset will build all new and youll have index overruns
+     */
+    private void updateDataSet()
+    {
+        for (int i = 0; i < editors.size(); i++) {
+            editors.get(i).clear();
+        }
+        active_workout_adapter.notifyDataSetChanged();
+
+    }
+
 
 }

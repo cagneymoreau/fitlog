@@ -53,13 +53,7 @@ public class Trophy_Dialog extends DialogFragment {
     // TODO: 6/8/2021 design trophies and link them to the numbers
     private Drawable getDrawable(int pos)
     {
-        switch (pos)
-        {
-            case 0:
-
-               return getResources().getDrawable(R.drawable.doomer);
-
-        }
+      
         return null;
     }
 

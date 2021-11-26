@@ -36,6 +36,9 @@ public class UserProfile {
     @ColumnInfo(name = "trophies")
     public ArrayList<Integer> trophies;
 
+    @ColumnInfo(name = "movements")
+    public ArrayList<String> movements;
+
     @ColumnInfo(name = "backups")
     public ArrayList<Triple<Long,Long, Boolean>> backups;
 

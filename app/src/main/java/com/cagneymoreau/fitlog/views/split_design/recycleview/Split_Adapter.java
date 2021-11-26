@@ -41,8 +41,28 @@ public class Split_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
         Split_ViewHolder split_viewHolder = (Split_ViewHolder) holder;
-        split_viewHolder.getSplitTitle().setText(data.get(position));
 
+        String v = data.get(position);
+        split_viewHolder.getSplitTitle().setText(v);
+
+
+        if (data.size() > 1 && position == 0){
+            split_viewHolder.getImageView().setImageResource(R.drawable.green_select);
+            split_viewHolder.getImageView().setMaxHeight(100);
+        }
+
+
+        if (v.equals(" Create New Split")){
+            split_viewHolder.getImageView().setImageResource(R.drawable.gold_arrow);
+            split_viewHolder.getImageView().setMaxHeight(100);
+        }
+
+
+    }
+
+    public void insertList(List<String> newish)
+    {
+        data = newish;
     }
 
     @Override

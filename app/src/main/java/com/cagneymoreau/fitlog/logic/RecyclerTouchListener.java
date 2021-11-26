@@ -64,7 +64,6 @@ public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         void onLongClick(View view, int position, float x, float y);
 
-        void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir);
 
     }
 

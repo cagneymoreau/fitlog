@@ -4,13 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.OpenableColumns;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,18 +28,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.MainActivity;
 import com.cagneymoreau.fitlog.R;
+import com.cagneymoreau.fitlog.data.ErrorLog;
 import com.cagneymoreau.fitlog.logic.BackupFileGenerator;
+import com.cagneymoreau.fitlog.logic.ComplexErrorLogger;
 import com.cagneymoreau.fitlog.logic.Controller;
 import com.cagneymoreau.fitlog.logic.Emailer;
+import com.cagneymoreau.fitlog.logic.Subscription;
+import com.cagneymoreau.fitlog.views.MyFragment;
 import com.cagneymoreau.fitlog.views.setting_utility.recycleview.Backup_Adapter;
 import com.cagneymoreau.fitlog.logic.RecyclerTouchListener;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Triple;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Opens from settings
@@ -47,7 +64,7 @@ import kotlin.Triple;
  *
  */
 
-public class DataBackup extends Fragment {
+public class DataBackup extends MyFragment {
 
     public static final String TAG = "Data_Backup";
 
@@ -56,6 +73,7 @@ public class DataBackup extends Fragment {
 
     EditText editTextEmail;
     TextView textViewExplain;
+    Button backup_btn, policyButton, privacyButton;
 
     RecyclerView recyclerView;
     Backup_Adapter backup_adapter;
@@ -65,6 +83,22 @@ public class DataBackup extends Fragment {
 
     ArrayList<Pair<String, Boolean>> humanReadable;
 
+    int freeCount;
+
+    private static final int REQUEST_CODE = 103;
+
+    String policy ="POLICY - This is not a permanent data backup app." +
+            " Old data is automatically deleted after 12 months to save space." +
+            " Make sure to send regular backups to your email for long term storage." +
+            "I recommend monthly data backups to prevent large losses." +
+            "Perform a workout and make a backup to ensure that the backups meet your requirements." +
+            "This app should auto-backup to your google drive if you get a new phone but please double check when switching device" +
+            "If you get an error making a data backup contact me and forward the generated email to tau6283@protonmail.com";
+
+    String privacy = "PRIVACY - Your data is not private. If this app crashes the data related to that crash is sent to the app designer to fix the bug." +
+            "There is no method to opt out. By using this app you consent to that usage. I have no intention of using your data other than making sure the app works." +
+            " Further governments and Non Government Organizations purposely embed tracking software and hardware everywhere which I cannot control." +
+            "Never publish private information in this app (or any app for that matter).";
 
 
     @Nullable
@@ -73,33 +107,90 @@ public class DataBackup extends Fragment {
 
         fragView = inflater.inflate(R.layout.backup, container, false);
 
+        freeCount = 0;
+
         MainActivity mainActivity = (MainActivity) getActivity();
         controller = mainActivity.getConroller();
+
+        backup_btn = fragView.findViewById(R.id.create_backup_button);
+        policyButton = fragView.findViewById(R.id.policy_Button);
+        privacyButton = fragView.findViewById(R.id.privacy_Button);
+
+        buildButtonText();
+
+        textViewExplain = fragView.findViewById(R.id.backup_TextView);
+        textViewExplain.setText(policy);
 
         fillEditText();
         buildRecycleView();
 
         return fragView;
 
+
+    }
+
+    private void buildButtonText()
+    {
+        backup_btn.setText("make backup");
+        backup_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendToBackUp();
+            }
+        });
+
+        backup_btn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                freemiumCounter();
+                return true;
+            }
+        });
+
+        policyButton.setText("Policy");
+        policyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textViewExplain.setText(policy);
+            }
+        });
+
+        privacyButton.setText("Privacy");
+        privacyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textViewExplain.setText(privacy);
+            }
+        });
+
     }
 
     private void fillEditText()
     {
         editTextEmail = fragView.findViewById(R.id.backup_EditText);
+        editTextEmail.setHint("email to send backups");
 
-         String s = controller.getUserName();
+         String s = controller.getEmail();
          if (s != null)
          {
              editTextEmail.setText(s);
          }
-        // TODO: 6/14/2021 save
+
+         if (s.equals("cagneyamoreau@gmail.com"))
+         {
+             editTextEmail.setOnLongClickListener(new View.OnLongClickListener() {
+                 @Override
+                 public boolean onLongClick(View v) {
+
+                     examineFile();
+
+                     return false;
+                 }
+             });
+         }
+
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        controller.setEmail(editTextEmail.getText().toString());
-    }
 
     private void buildRecycleView()
     {
@@ -117,30 +208,18 @@ public class DataBackup extends Fragment {
             @Override
             public void onClick(View view, int position, float x, float y) {
 
-
-                if (position == 0){
-
-                    sendToBackUp();
-
-                }else{
-
                   humanReadable.set(position, new Pair<>(humanReadable.get(position).first, !humanReadable.get(position).second));
                    backup_adapter.notifyDataSetChanged();
-                }
+
 
             }
 
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-                // TODO: 5/27/2021 copy split
-
             }
 
-            @Override
-            public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
 
-            }
 
         }));
 
@@ -154,13 +233,19 @@ public class DataBackup extends Fragment {
      */
     private void  buildUIList()
     {
-        humanReadable.clear();
+        humanReadable = new ArrayList<>();
 
-        humanReadable.add(new Pair<>("Create backups Now!", Boolean.FALSE));
+        if (backups == null || backups.size() == 0){
+
+            humanReadable.add(new Pair<>("no history yet", Boolean.FALSE));
+            return;
+        }
+
 
         for (int i = 0; i < backups.size(); i++) {
 
-            LocalDate d = LocalDate.ofEpochDay(backups.get(i).getFirst());
+            LocalDate d =  Instant.ofEpochMilli(backups.get(i).getFirst()).atZone(ZoneId.systemDefault()).toLocalDate();
+
 
             String yet = "  !";
 
@@ -172,20 +257,19 @@ public class DataBackup extends Fragment {
 
         }
 
-
     }
-
 
 
     private void sendToBackUp()
     {
+
         controller.setEmail(editTextEmail.getText().toString());
 
         if (controller.getEmail() == null || controller.getEmail().equals("")){
             Toast.makeText(getContext(), "You must input your email into app setting first", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (isMailClientPresent(getContext())){
+        if (!isMailClientPresent(getContext())){
             Toast.makeText(getContext(), "You must have an email app installed", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -196,23 +280,28 @@ public class DataBackup extends Fragment {
             if (humanReadable.get(i).second){
                 toBackup.add(backups.get(i));
                 humanReadable.set(i, new Pair<>(humanReadable.get(i).first, Boolean.FALSE));
+                //humanReadable.set(position, new Pair<>(humanReadable.get(position).first, !humanReadable.get(position).second));
             }
         }
-        //send anything not backed up
-        if (toBackup.size() == 0)
-        {
-            for (int i = 0; i < backups.size(); i++) {
-                if (!backups.get(i).getThird()){
-                    toBackup.add(backups.get(i));
-                }
-            }
 
-        }
+        backup_adapter.notifyDataSetChanged();
+
+
 
         new Thread(() -> {
-            BackupFileGenerator backupFileGenerator = new BackupFileGenerator(controller);
+            BackupFileGenerator backupFileGenerator = new BackupFileGenerator(controller, getContext());
             ArrayList<File> backups = backupFileGenerator.generateBackupFiles(toBackup);
-            Emailer emailer = new Emailer(backups);
+            if (backups.size() == 0){
+
+                this.getActivity().runOnUiThread (new Runnable() {
+                    public void run() {
+                        Toast.makeText(getContext(), "No workouts in this period", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+                return;
+            }
+            Emailer emailer = new Emailer(backups, getContext(), controller);
             emailer.send();
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -223,7 +312,6 @@ public class DataBackup extends Fragment {
             });
         }).start();
     }
-
 
 
     public static boolean isMailClientPresent(Context context){
@@ -238,6 +326,133 @@ public class DataBackup extends Fragment {
             return true;
     }
 
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        controller.setEmail(editTextEmail.getText().toString());
+    }
+
+
+    private void freemiumCounter()
+    {
+        if (freeCount > 6){
+            Subscription s = controller.getSubscription();
+            s.activateFreemium();
+            Toast.makeText(getContext(), "Freemium Engaged", Toast.LENGTH_SHORT).show();
+            freeCount = 0;
+        }
+        else {
+            freeCount++;
+        }
+
+    }
+
+
+
+
+    //region---------------Debugging a non local workout record. Not used by end users
+
+    private void examineFile()
+    {
+
+        showFileChooser();
+
+
+
+    }
+
+
+    public void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+
+        // Update with mime types
+        intent.setType("text/plain");
+
+        // Update with additional mime types here using a String[].
+        //intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+
+        // Only pick openable and local files. Theoretically we could pull files from google drive
+        // or other applications that have networked files, but that's unnecessary for this example.
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+
+        // REQUEST_CODE = <some-integer>
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If the user doesn't pick a file just return
+        if (requestCode != REQUEST_CODE || resultCode != RESULT_OK) {
+            return;
+        }
+
+        try {
+            Uri uri = data.getData();
+            File f = new File(uri.getPath());
+            ErrorLog log = ErrorLog.revertToObject(f);
+            BackupFileGenerator bfg = new BackupFileGenerator(controller, getContext());
+            bfg.debugRemoteData(log);
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(getContext(), " failed", Toast.LENGTH_SHORT).show();
+        }
+
+        // Import the file
+       // importFile(data.getData());
+    }
+/*
+    public void importFile(Uri uri)
+    {
+        String fileName = getFileName(uri);
+
+        // The temp file could be whatever you want
+
+        File fileCopy = copyToTempFile(uri, BackupFileGenerator.getFilePath("input", ".txt", getContext()));
+
+        // Done!
+    }
+
+    private String getFileName(Uri uri) throws IllegalArgumentException {
+        // Obtain a cursor with information regarding this uri
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+
+        if (cursor.getCount() <= 0) {
+            cursor.close();
+            throw new IllegalArgumentException("Can't obtain file name, cursor is empty");
+        }
+
+        cursor.moveToFirst();
+
+        String fileName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+
+        cursor.close();
+
+        return fileName;
+    }
+
+
+    private File copyToTempFile(Uri uri, File tempFile) throws IOException {
+        // Obtain an input stream from the uri
+        InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
+
+        if (inputStream == null) {
+            throw new IOException("Unable to obtain input stream from URI");
+        }
+
+        // Copy the stream to the temp file
+        FileUtils.copy(inputStream, new FileDescriptor());
+
+        return tempFile;
+    }
+
+
+ */
+    //endregion
 
 
 }

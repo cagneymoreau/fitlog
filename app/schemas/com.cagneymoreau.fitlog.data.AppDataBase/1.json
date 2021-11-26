@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "79ac893ce8a445e5ccd0e976fbc29ea2",
+    "identityHash": "18333283453789d1a601bf767834235f",
     "entities": [
       {
         "tableName": "UserProfile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `user_name` TEXT, `email` TEXT, `first_launch` INTEGER NOT NULL, `check_list` INTEGER NOT NULL, `statistics` INTEGER NOT NULL, `body_measure` INTEGER NOT NULL, `trophies` TEXT, `backups` TEXT, `timers` TEXT, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `user_name` TEXT, `email` TEXT, `first_launch` INTEGER NOT NULL, `check_list` INTEGER NOT NULL, `statistics` INTEGER NOT NULL, `body_measure` INTEGER NOT NULL, `trophies` TEXT, `movements` TEXT, `backups` TEXT, `timers` TEXT, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -53,6 +53,12 @@
           {
             "fieldPath": "trophies",
             "columnName": "trophies",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "movements",
+            "columnName": "movements",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -280,7 +286,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '79ac893ce8a445e5ccd0e976fbc29ea2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '18333283453789d1a601bf767834235f')"
     ]
   }
 }

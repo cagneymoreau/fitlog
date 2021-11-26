@@ -16,7 +16,7 @@ public class CheckLists {
     @ColumnInfo(name = "checkList_name")
     public String checkListName;
 
-    // TODO: 6/3/2021 abandone this feature
+    // abandon
     @ColumnInfo(name = "selected")
     public boolean selected;
 
@@ -26,8 +26,7 @@ public class CheckLists {
     @ColumnInfo(name = "checkList")
     public ArrayList<String> checkList;
 
-    // TODO: 6/3/2021 this isnt really needed because its always true and no data is stored here
-    //the actual notes are for that specific workout sesh
+    //abandon
     @ColumnInfo(name = "notes")
     public boolean notes;
 

@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.R;
-import com.cagneymoreau.fitlog.views.checklist_design.recycleview.CheckList_ViewHolder;
+import com.cagneymoreau.fitlog.views.checklist.recycleview.CheckList_ViewHolder;
 
 import java.util.ArrayList;
 

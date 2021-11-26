@@ -9,13 +9,21 @@
 
     <TextView
         android:id="@+id/checklist_item_title_textView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/checklist_item__imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/checklist_item_title_textView"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

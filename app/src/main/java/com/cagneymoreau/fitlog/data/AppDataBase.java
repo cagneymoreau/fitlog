@@ -14,7 +14,6 @@ import androidx.room.TypeConverters;
  *
  */
 
-    // TODO: 5/14/2021 users need to understand that they cant disable auto backups, they need wifi, must have a play store account and they must email themselves for long term data backup
 
     @Database(entities = {UserProfile.class, CheckLists.class, Splits.class, WorkoutRecord.class}, version = 1)
     @TypeConverters({ListConverters.class})

@@ -6,10 +6,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @Entity
-public class WorkoutRecord {
+public class WorkoutRecord implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     public int uid;
@@ -27,12 +28,12 @@ public class WorkoutRecord {
 
 
     @ColumnInfo(name = "checklist")
-    public ArrayList<Pair<String, Boolean>> checkList;
+    public transient ArrayList<Pair<String, Boolean>> checkList;
 
     @ColumnInfo(name = "notes")
     public String notes;
 
-    //each sublist will start with a movement desciption followed by users input
+    //each sublist will start with a movement description followed by users input
     @ColumnInfo(name = "workout")
     public ArrayList<ArrayList<String>> workout;
 

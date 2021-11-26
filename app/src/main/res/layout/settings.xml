@@ -19,26 +19,6 @@
         android:layout_height="wrap_content"
         android:hint="your_email@service.com"/>
 
-    <CheckBox
-        android:id="@+id/checkList_checkedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checkMark="@drawable/checked"
-        android:text="@string/check_list"/>
-
-    <CheckBox
-        android:id="@+id/bodymeasure_checkedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checkMark="@drawable/checked"
-        android:text="@string/body_measure"/>
-
-    <CheckBox
-        android:id="@+id/statistics_checkedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checkMark="@drawable/checked"
-        android:text="@string/statistics"/>
 
 
 

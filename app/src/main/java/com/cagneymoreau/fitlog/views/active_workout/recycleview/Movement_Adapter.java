@@ -16,13 +16,15 @@ public class Movement_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     ArrayList<String> data;
     Active_Workout active_workout;
-    int position;
+    int pos;
+    ActiveWorkout_ViewHolder aViewHolder;
 
-    public Movement_Adapter(ArrayList<String> dataField, Active_Workout active_workout, int position)
+    public Movement_Adapter(ArrayList<String> dataField, Active_Workout active_workout, int position, ActiveWorkout_ViewHolder v)
     {
+        aViewHolder = v;
         data = dataField;
         this.active_workout = active_workout;
-        this.position = position;
+        this.pos = position;
     }
 
     @NonNull
@@ -33,7 +35,7 @@ public class Movement_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         View v = inflater.inflate(R.layout.movement_card, parent, false);
-        viewHolder = new Movement_ViewHolder(v, active_workout, position);
+        viewHolder = new Movement_ViewHolder(v, active_workout, pos, aViewHolder);
 
         return viewHolder;
     }
@@ -52,7 +54,7 @@ public class Movement_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         if (position == data.size()-1){
-            movement_viewHolder.showButton();
+            movement_viewHolder.showButton(position);
         }
 
 

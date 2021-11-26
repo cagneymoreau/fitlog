@@ -24,16 +24,24 @@ public class History_Summary_ViewHolder extends RecyclerView.ViewHolder {
         date = view.findViewById(R.id.histSum_date_TextView);
 
 
-
     }
 
 
    public void setVals(HistoryItem hist)
    {
-       splitName.setText(hist.splitName);
-       dayName.setText(hist.dayName);
-       this.date.setText(hist.date.toString());
+       String v1 = hist.splitName + "  ";
+       splitName.setText(v1);
+       String v2 = hist.dayName + "  ";
+       dayName.setText(v2);
+       String dVal = hist.date.getDayOfWeek().toString() + " the " + hist.date.getDayOfMonth();
+       this.date.setText(dVal);
+
    }
 
+    public void setDebug(HistoryItem historyItem)
+    {
+        String n = Integer.toString(historyItem.uid);
+        splitName.setText(n);
+    }
 
 }

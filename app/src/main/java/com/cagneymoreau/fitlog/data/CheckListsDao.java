@@ -21,10 +21,10 @@ public interface CheckListsDao {
     void insert(CheckLists checkLists);
 
     @Update
-    void update(CheckLists checkLists);
+    int update(CheckLists checkLists);
 
     @Delete
-    void delete(CheckLists checkLists);
+    int delete(CheckLists checkLists);
 
 
 }

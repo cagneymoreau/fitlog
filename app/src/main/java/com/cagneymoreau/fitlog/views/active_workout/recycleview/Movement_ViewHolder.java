@@ -25,10 +25,12 @@ public class Movement_ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout layout;
 
         Active_Workout active_workout;
+        ActiveWorkout_ViewHolder viewHolder;
 
-    public Movement_ViewHolder(@NonNull View itemView, Active_Workout active_workout, int position) {
+    public Movement_ViewHolder(@NonNull View itemView, Active_Workout active_workout, int position, ActiveWorkout_ViewHolder v) {
         super(itemView);
 
+        viewHolder = v;
         layout = itemView.findViewById(R.id.movecard_layout);
         editText = itemView.findViewById(R.id.movement_EditText);
         //button = itemView.findViewById(R.id.movement_Button);
@@ -47,7 +49,7 @@ public class Movement_ViewHolder extends RecyclerView.ViewHolder {
     }
 
     //if last item in que we should show a button when user fills in some data
-    public void showButton()
+    public void showButton(int pos)
     {
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -57,9 +59,11 @@ public class Movement_ViewHolder extends RecyclerView.ViewHolder {
 
                     buttonHidden = false;
 
+
+
                     button = new Button(view.getContext());
                     button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    button.setText("Next");
+                    button.setText("Enter");
 
                     layout.addView(button);
 
@@ -73,6 +77,9 @@ public class Movement_ViewHolder extends RecyclerView.ViewHolder {
                         }
                     });
 
+                    viewHolder.scrollRight();
+                   //mrecycler.smoothScrollToPosition(position);
+                   //mrecycler.fling(-50,0);
 
                 }
 

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/main_Menu_Fragment"
-        android:name="com.cagneymoreau.fitlog.views.Main_Menu_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.main_menu.Main_Menu_Fragment"
         android:label="Main_Menu_Fragment" >
         <action
             android:id="@+id/action_main_Menu_Fragment_to_routine_Builder_Fragment"
@@ -28,16 +28,17 @@
             android:id="@+id/action_main_Menu_Fragment_to_checkList_Chooser_Fragment"
             app:destination="@id/checkList_Chooser_Fragment" />
         <action
-            android:id="@+id/action_main_Menu_Fragment_to_history"
-            app:destination="@id/ExistingPicker" />
+            android:id="@+id/action_main_Menu_Fragment_to_history_Chooser"
+            app:destination="@id/history_Chooser" />
     </fragment>
     <fragment
         android:id="@+id/checkList_Chooser_Fragment"
-        android:name="com.cagneymoreau.fitlog.views.checklist_design.CheckList_Chooser"
+        android:name="com.cagneymoreau.fitlog.views.checklist.CheckList_Chooser"
         android:label="CheckList_Chooser_Fragment" >
         <action
             android:id="@+id/action_checkList_Chooser_Fragment_to_checkList_Edit_Fragment"
             app:destination="@id/checkList_Edit_Fragment"
+
             />
     </fragment>
     <fragment
@@ -50,11 +51,12 @@
     </fragment>
     <fragment
         android:id="@+id/day_Chooser_Fragment"
-        android:name="com.cagneymoreau.fitlog.views.Day_Chooser_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.day_choose.Day_Chooser_Fragment"
         android:label="Day_Chooser_Fragment">
         <action
             android:id="@+id/action_day_Chooser_Fragment_to_workout_Holder_Fragment"
-            app:destination="@id/workout_Holder_Fragment" />
+            app:destination="@id/workout_Holder_Fragment"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/body_Measure"
@@ -77,20 +79,12 @@
         app:destination="@id/settings_Fragment" />
     <fragment
         android:id="@+id/checkList_Edit_Fragment"
-        android:name="com.cagneymoreau.fitlog.views.checklist_design.checkList_Edit_Fragment"
+        android:name="com.cagneymoreau.fitlog.views.checklist.checkList_Edit_Fragment"
         android:label="checkList_Edit_Fragment" />
     <fragment
         android:id="@+id/workout_Holder_Fragment"
         android:name="com.cagneymoreau.fitlog.views.Workout_Holder_Fragment"
         android:label="Workout_Holder_Fragment" />
-    <fragment
-        android:id="@+id/ExistingPicker"
-        android:name="com.cagneymoreau.fitlog.views.Existing_Workout_Picker"
-        android:label="ExistingPicker">
-        <action
-            android:id="@+id/action_history_to_workout_Holder_Fragment"
-            app:destination="@id/workout_Holder_Fragment" />
-    </fragment>
     <fragment
         android:id="@+id/dataBackup"
         android:name="com.cagneymoreau.fitlog.views.setting_utility.DataBackup"
@@ -105,5 +99,45 @@
     <action
         android:id="@+id/action_global_trophies"
         app:destination="@id/trophies" />
+    <fragment
+        android:id="@+id/history_Chooser"
+        android:name="com.cagneymoreau.fitlog.views.history_viewer.History_Chooser"
+        android:label="History_Chooser" >
+        <action
+            android:id="@+id/action_history_Chooser_to_workout_Holder_Fragment"
+            app:destination="@id/workout_Holder_Fragment" />
+        <action
+            android:id="@+id/action_history_Chooser_to_read_History"
+            app:destination="@id/read_History" />
+        <action
+            android:id="@+id/action_history_Chooser_to_view_History"
+            app:destination="@id/view_History" />
+    </fragment>
+    <fragment
+        android:id="@+id/read_History"
+        android:name="com.cagneymoreau.fitlog.views.history_viewer.Read_History"
+        android:label="Read_History" >
+        <argument
+            android:name="recordUID"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/history_Periods"
+        android:name="com.cagneymoreau.fitlog.views.period_viewer.History_Periods"
+        android:label="History_Periods" />
+    <action
+        android:id="@+id/action_global_history_Periods"
+        app:destination="@id/history_Periods" />
+    <action
+        android:id="@+id/action_global_history_Chooser"
+        app:destination="@id/history_Chooser" />
+    <action
+        android:id="@+id/action_global_day_Chooser_Fragment"
+        app:destination="@id/day_Chooser_Fragment" />
+    <fragment
+        android:id="@+id/view_History"
+        android:name="com.cagneymoreau.fitlog.views.history_viewer.View_History"
+        android:label="View_History" />
 
 </navigation>

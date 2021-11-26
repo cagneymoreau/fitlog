@@ -1,6 +1,7 @@
 package com.cagneymoreau.fitlog.data;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -19,7 +20,8 @@ public interface WorkoutRecordDao {
     @Query("Select Max(uid) From workoutrecord")
     int getLastEntry();
 
-    @Query("Select * From workoutrecord Where millis Between :start And :done Order By millis")
+    @Query("Select * From workoutrecord" + " Where millis Between :done And :start Order By millis")
+    //@Query("Select * From workoutrecord Where millis ")
     List<WorkoutRecord> getSelection(long start, long done);
 
     @Query("Select * From workoutrecord Where uid=:uidR")
@@ -32,8 +34,13 @@ public interface WorkoutRecordDao {
     void insert(WorkoutRecord workoutRecord);
 
     @Update
-    void update(WorkoutRecord workoutRecord);
+    int update(WorkoutRecord workoutRecord);
 
+    @Query("Delete From workoutrecord Where uid = :uidVal")
+    int delete(int uidVal);
+
+    @Query("Delete From workoutrecord Where millis < :milliVal")
+    void deleteOld(int milliVal);
 
 
 }

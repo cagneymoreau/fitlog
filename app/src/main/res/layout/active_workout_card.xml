@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -7,8 +7,19 @@
 
     <TextView
         android:id="@+id/activeWorkoutTitle_TextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <Button
+        android:id="@+id/freestyle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/activeWorkoutTitle_TextView"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/movement_recycleView"
@@ -17,9 +28,9 @@
         android:layout_marginBottom="8dp"
         android:layout_weight="20"
         android:layout_width="match_parent"
-        app:layout_constraintBottom_toTopOf="@+id/chooser_textView">
+        app:layout_constraintTop_toBottomOf="@+id/activeWorkoutTitle_TextView">
 
     </androidx.recyclerview.widget.RecyclerView>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

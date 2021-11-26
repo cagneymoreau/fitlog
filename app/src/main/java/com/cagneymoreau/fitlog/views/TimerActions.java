@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +22,7 @@ import com.cagneymoreau.fitlog.MainActivity;
 import com.cagneymoreau.fitlog.R;
 import com.cagneymoreau.fitlog.logic.Controller;
 import com.cagneymoreau.fitlog.logic.RecyclerTouchListener;
-import com.cagneymoreau.fitlog.views.checklist_design.recycleview.CheckList_Adapter;
+import com.cagneymoreau.fitlog.views.generic_recycler.Generic_Adapter;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -29,9 +31,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Child window of workout holder
- * Handy timerActions for measuring rest or sets
+ * Handy timers for measuring rest or sets
  *
- * format as time x repeats
+ * simple stopwatch
+ *
+ * interval timer as delay x counts
+ *
  *
  */
 
@@ -44,21 +49,21 @@ public class TimerActions extends Fragment {
 
     Button startStopWatch_Btn, resetStopWatch_Btn, creatTimer_Btn, startTimer_Btn;
 
-    NumberPicker delay_ET, count_ET;
+    EditText delay_ET, count_ET;
 
     TextView stopwatch_TV;
 
     RecyclerView recyclerView;
-    CheckList_Adapter checkList_adapter;
+    Generic_Adapter generic_adapter;
     RecyclerView.LayoutManager layoutManager;
 
 
     long stopWatchStartTime, stopwatch_HoldAmount;
 
     boolean stopwatchRunning = false;
-    Timer stopwatch = new Timer();
+    Timer stopwatch;
 
-    Timer upTimer = new Timer();
+    Timer upTimer;
     boolean timerRunning = false;
     int count = 0;
     int repeat;
@@ -152,29 +157,30 @@ public class TimerActions extends Fragment {
         recyclerView = fragView.findViewById(R.id.timer_RecycleView);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        checkList_adapter = new CheckList_Adapter(uiView);
-        recyclerView.setAdapter(checkList_adapter);
+        generic_adapter = new Generic_Adapter(uiView);
+        recyclerView.setAdapter(generic_adapter);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position, float x, float y) {
 
-               checkList_adapter.setChosen(position);
-               checkList_adapter.notifyDataSetChanged();
+                if (generic_adapter.getChosen() == position){
+                    return;
+                }
+
+               generic_adapter.setChosen(position);
+               generic_adapter.notifyDataSetChanged();
 
             }
 
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-                controller.selectCheckList(position);
+                deleteTimer(position);
 
             }
 
-            @Override
-            public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
 
-            }
         }));
 
 
@@ -185,11 +191,14 @@ public class TimerActions extends Fragment {
 
     private String buildText(Pair<Integer, Integer> inp)
     {
-        return inp.first + " second intervals repeated " + inp.second + "times";
+        return inp.first + " seconds - repeated " + inp.second;
     }
 
-    private void deleteTimer()
+    private void deleteTimer(int pos)
     {
+        timers.remove(pos);
+        uiView.remove(pos);
+        controller.deleteTimer(pos);
 
     }
 
@@ -200,27 +209,52 @@ public class TimerActions extends Fragment {
 
         if (timerRunning){
 
+            startTimer_Btn.setText("start");
+
             upTimer.cancel();
             timerRunning = false;
 
             return;
+
         }
 
-        if (checkList_adapter.getChosen() == -1) return;
-        count = 0;
 
-        long delay = timers.get(checkList_adapter.getChosen()).first;
+        if (generic_adapter.getChosen() == -1){
+            try {
+                addNewTimer();
+            }catch (Exception e){
+                // TODO: 11/4/2021 error tried starting timer with nothing filled in
+                return;
+            }
+
+            if (generic_adapter.getChosen() == -1){
+                return;
+            }
+
+        }
+
+        upTimer = new Timer();
+
+        startTimer_Btn.setText("stop");
+
+        //count = 0;
+
+        long delay = timers.get(generic_adapter.getChosen()).first;
         delay *= 1000;
-        repeat = timers.get(checkList_adapter.getChosen()).second;
+        repeat = timers.get(generic_adapter.getChosen()).second;
 
         upTimer.scheduleAtFixedRate(new TimerTask() {
+
+            int tally = 0;
+
             @Override
             public void run() {
+
                 mp.start();
-                if (count == repeat){
-                    timerRunning = false;
-                    this.cancel();
-                }
+                tally++;
+
+                if (tally == repeat)  timerStop();
+
             }
         },0,delay);
 
@@ -229,16 +263,42 @@ public class TimerActions extends Fragment {
 
     private void addNewTimer()
     {
-        int delay = Integer.valueOf(delay_ET.toString());
-        int repeat = Integer.valueOf(count_ET.toString());
+
+
+        int delay = Integer.valueOf(delay_ET.getText().toString());
+        int repeat = Integer.valueOf(count_ET.getText().toString());
+
+        if (delay < 1 || delay > 60 || repeat < 1 || repeat > 60){
+            delay_ET.setText("");
+            count_ET.setText("");
+
+            Toast.makeText(this.getContext(), "Values between 1 and 60 only", Toast.LENGTH_SHORT).show();
+
+        }
 
         timers.add(new Pair<>(delay, repeat));
+        controller.addTimer(delay, repeat);
         uiView.add(buildText(timers.get(timers.size()-1)));
 
-        checkList_adapter.notifyDataSetChanged();
+        generic_adapter.setChosen(timers.size()-1);
+        generic_adapter.notifyDataSetChanged();
+
+        delay_ET.setText("");
+        count_ET.setText("");
 
     }
 
+    private void timerStop()
+    {
+        this.getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            toggleTimer();
+
+        }
+    });
+
+    }
 
     //region -------------------------- stopwatch
 
@@ -247,23 +307,29 @@ public class TimerActions extends Fragment {
 
         if (stopwatchRunning){
 
+            startStopWatch_Btn.setText("Start");
+
+
             stopwatch.cancel();
             stopwatch_HoldAmount += System.currentTimeMillis() - stopWatchStartTime;
 
         }else{
+            startStopWatch_Btn.setText("Stop");
+
+            stopwatch = new Timer();
 
         stopWatchStartTime = System.currentTimeMillis();
 
 
 
-        stopwatch.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
+                  stopwatch.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
 
-                updateStopWatchDisplay();
+                    updateStopWatchDisplay();
 
-            }
-        }, 0,1000);
+                }
+            }, 0,1000);
 
 
         }
@@ -297,8 +363,15 @@ public class TimerActions extends Fragment {
         }
 
         String done = minute + second;
-        stopwatch_TV.setText(done);
 
+
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopwatch_TV.setText(done);
+
+            }
+        });
 
     }
 
@@ -307,9 +380,13 @@ public class TimerActions extends Fragment {
         stopwatch_HoldAmount = 0;
         stopwatch.cancel();
         stopwatchRunning = false;
+        stopwatch_TV.setText("00:00");
+
 
     }
 
     //endregion
+
+
 
 }

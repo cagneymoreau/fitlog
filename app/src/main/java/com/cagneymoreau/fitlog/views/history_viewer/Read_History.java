@@ -26,12 +26,16 @@ import java.util.ArrayList;
 
 public class Read_History extends Fragment {
 
-    public static final String TAG = "Easy_History";
+    public static final String TAG = "Read_History";
 
     private View fragView;
     Controller controller;
 
     TableLayout tableLayout;
+
+    TextView read_status_Tv;
+
+    ArrayList<ArrayList<String>> record;
 
     private int uid;
 
@@ -44,23 +48,52 @@ public class Read_History extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        fragView = inflater.inflate(R.layout.easy_history, container, false);
+        fragView = inflater.inflate(R.layout.read_history, container, false);
+
+        //int uid = getArguments().getInt("uid");
 
         MainActivity mainActivity = (MainActivity) getActivity();
         controller = mainActivity.getConroller();
 
         tableLayout = fragView.findViewById(R.id.read_history_TableLayout);
+        read_status_Tv = fragView.findViewById(R.id.read_status_TextView);
 
-        buildView();
+        //buildView();
+        requestData();
+
+        // TODO: 10/27/2021 add a call to history viewer swp on backpress
 
         return fragView;
 
     }
 
+    private void requestData()
+    {
+        new Thread(()-> {
 
+            record = new ArrayList<>(controller.openExistingWorkoutRecord(uid).workout);
+
+            this.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                   buildView();
+
+                }
+            });
+
+
+        }).start();
+
+    }
+
+
+    //need to be called after data is returned asynchronusly
     public void buildView()
     {
-        ArrayList<ArrayList<String>> record = new ArrayList<>(controller.openExistingWorkoutRecord(uid).workout);
+        if (record == null){
+            // TODO: 10/27/2021 error
+            read_status_Tv.setText("Error: Unable to pull record");
+        }
 
         if (record.size() == 0) return;
 

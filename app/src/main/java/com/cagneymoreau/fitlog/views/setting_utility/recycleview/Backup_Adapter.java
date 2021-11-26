@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.R;
-import com.cagneymoreau.fitlog.views.checklist_design.recycleview.CheckList_ViewHolder;
+import com.cagneymoreau.fitlog.views.checklist.recycleview.CheckList_ViewHolder;
 
 import java.util.ArrayList;
 
@@ -43,8 +43,12 @@ public class Backup_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
         CheckList_ViewHolder checkList_viewHolder = (CheckList_ViewHolder) holder;
-        checkList_viewHolder.getCheckListTitle().setText(data.get(position).first);
-        // TODO: 6/14/2021 set a border around any item that is selected
+        String v = data.get(position).first;
+
+        if ( data.get(position).second){
+            v += "  go";
+        }
+        checkList_viewHolder.getCheckListTitle().setText(v);
 
     }
 

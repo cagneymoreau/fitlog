@@ -21,9 +21,9 @@ public interface SplitsDao {
     void insert(Splits splits);
 
     @Update
-    void update(Splits splits);
+    int update(Splits splits);
 
     @Delete
-    void delete(Splits splits);
+    int delete(Splits splits);
 
 }

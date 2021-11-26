@@ -44,7 +44,7 @@ public class Trophies extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        fragView = inflater.inflate(R.layout.easy_history, container, false);
+        fragView = inflater.inflate(R.layout.history_chooser, container, false);
 
         MainActivity mainActivity = (MainActivity) getActivity();
         controller = mainActivity.getConroller();
@@ -83,10 +83,7 @@ public class Trophies extends Fragment {
 
             }
 
-            @Override
-            public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
 
-            }
         }));
 
 

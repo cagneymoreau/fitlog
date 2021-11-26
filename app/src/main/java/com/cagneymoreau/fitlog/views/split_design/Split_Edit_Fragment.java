@@ -1,11 +1,12 @@
 package com.cagneymoreau.fitlog.views.split_design;
 
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,13 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cagneymoreau.fitlog.MainActivity;
 import com.cagneymoreau.fitlog.R;
+import com.cagneymoreau.fitlog.data.Splits;
 import com.cagneymoreau.fitlog.logic.Controller;
+import com.cagneymoreau.fitlog.views.SwipeToDeleteCallback;
 import com.cagneymoreau.fitlog.views.split_design.recycleview.ListItem;
-import com.cagneymoreau.fitlog.logic.RecycleDragCallback;
 import com.cagneymoreau.fitlog.logic.RecyclerTouchListener;
 import com.cagneymoreau.fitlog.views.Description_Dialog;
 import com.cagneymoreau.fitlog.views.MyFragment;
 import com.cagneymoreau.fitlog.views.split_design.recycleview.Split_Edit_Adapter;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -58,16 +61,12 @@ public class Split_Edit_Fragment extends MyFragment {
 
         toEdit = controller.getSplitToModify();
 
+        buildRecycleView(toEdit);
+
         return fragView;
 
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        buildRecycleView(toEdit);
-    }
 
 
     private void buildRecycleView(int toEdit)
@@ -86,46 +85,26 @@ public class Split_Edit_Fragment extends MyFragment {
         recyclerView.setAdapter(split_adapter);
 
 
-        RecycleDragCallback recycleDragCallback = new RecycleDragCallback(this.getContext()) {
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
-                int position = viewHolder.getAdapterPosition();
-                //checklistinputs.remove(position);
-                save();
-                //checkList_adapter.notifyDataSetChanged();
-
-            }
-        } ;
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(recycleDragCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-
-
-
-
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position, float x, float y) {
 
                 listItemBeingEdited = position;
-                new Description_Dialog(structured.get(position).getEditPrompt(), structured.get(position).title, parent).show(getChildFragmentManager(), " Edit Item Dialog");
+                new Description_Dialog(structured.get(position).getEditPrompt(), structured.get(position).title, parent, structured.get(position).isField()).show(getChildFragmentManager(), " Edit Item Dialog");
 
             }
 
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-                // TODO: 5/21/2021 delete checklist component
+
 
             }
 
-            @Override
-            public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                Log.d("ggg", "onSwipe: ");
-            }
+
         }));
 
+        enableSwipeDelete();
 
     }
 
@@ -136,6 +115,10 @@ public class Split_Edit_Fragment extends MyFragment {
      */
     @Override
     public void sendDialogResult(String result) {
+
+        if (structured.get(listItemBeingEdited).isField()){
+            controller.addMovement(result);
+        }
 
         int main = structured.get(listItemBeingEdited).mainList;
         int sub = structured.get(listItemBeingEdited).subList;
@@ -148,16 +131,11 @@ public class Split_Edit_Fragment extends MyFragment {
         }
         inputs.get(main).set(sub, result);
 
+        listItemBeingEdited = -1;
 
         convertSplitArraysIntoList();
 
-
-        listItemBeingEdited = -1;
-        split_adapter.notifyDataSetChanged();
-
         save();
-
-
 
     }
 
@@ -221,6 +199,7 @@ public class Split_Edit_Fragment extends MyFragment {
             Extra.mainList = i;
             Extra.subList = inputs.get(i).size();
             Extra.myType = ListItem.type.FIELD;
+            Extra.uiPlaceHolder = true;
             structured.add(Extra);
 
 
@@ -233,39 +212,95 @@ public class Split_Edit_Fragment extends MyFragment {
             Two.mainList = inputs.size();
             Two.subList = 0;
             Two.myType = ListItem.type.HEADER;
+            Two.uiPlaceHolder = true;
             structured.add(Two);
         }
 
+        if (split_adapter != null){
+            split_adapter.notifyDataSetChanged();
+        }
+
 
     }
 
 
 
-    private ArrayList<ArrayList<String>> insertUIInputs(ArrayList<ArrayList<String>> damagedlist)
+
+
+
+    private void enableSwipeDelete()
     {
 
-        if (damagedlist == null)
-        {
-            damagedlist = new ArrayList<>();
-        }
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(getContext()) {
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+                final int position = viewHolder.getAdapterPosition();
+
+                if (position == 0){
+
+                    Toast.makeText(fragView.getContext(), "Can't delete. This is the title. Click to Edit", Toast.LENGTH_SHORT).show();
+                    split_adapter.notifyDataSetChanged();
+                }else if (structured.get(position).uiPlaceHolder){
+
+                    Toast.makeText(fragView.getContext(), "Can't delete. This is the button to add a new item", Toast.LENGTH_SHORT).show();
+                    split_adapter.notifyDataSetChanged();
+                }
+                else {
+
+                    int main = structured.get(position).mainList;
+                    int sub = structured.get(position).subList;
+
+                    ArrayList<String> val;
+
+                    if (sub == 0){
+                        val = inputs.get(main);
+                        inputs.remove(main);
+                    }else{
+                        val = new ArrayList<>();
+                        val.add(inputs.get(main).get(sub));
+                        inputs.get(main).remove(sub);
+                    }
+
+                    convertSplitArraysIntoList();
 
 
-        if (damagedlist.size() == 0){
-            ArrayList<String> t = new ArrayList<>();
-            t.add( " New Split");
-            damagedlist.add(0, t);
-        }
+                    Snackbar snackbar = Snackbar
+                            .make(fragView, "Item was removed from the list.", Snackbar.LENGTH_LONG);
+                    snackbar.setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-        ArrayList<String> n = new ArrayList<>();
-        n.add("Add New Day");
-        damagedlist.add(n);
+                            if (sub == 0){
+                                inputs.add(main, val);
+                            }else{
+                                inputs.get(main).add(sub, val.get(0));
+                            }
 
-        for (int i = 1; i < damagedlist.size()-1; i++) {
-            damagedlist.get(i).add("Add New Movement");
-        }
+                            convertSplitArraysIntoList();
+                            recyclerView.scrollToPosition(position);
+                            split_adapter.notifyDataSetChanged();
+                        }
+                    });
 
-        return damagedlist;
+
+                    snackbar.setActionTextColor(Color.YELLOW);
+                    snackbar.show();
+
+                    save();
+
+                }
+
+            }
+        };
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchhelper.attachToRecyclerView(recyclerView);
     }
+
+
+
+
 
 
 }

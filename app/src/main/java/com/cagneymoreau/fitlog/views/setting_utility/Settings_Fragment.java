@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -55,6 +54,11 @@ public class Settings_Fragment extends Fragment {
             emailEditText.setText(email);
         }
 
+
+
+
+        // TODO: 10/21/2021 show this stuff even if they dont use it
+        /*
         statisticsCheckedText = fragView.findViewById(R.id.statistics_checkedText);
          statisticsCheckedText.setChecked(controller.bodyMeasureBool());
         statisticsCheckedText.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -86,7 +90,7 @@ public class Settings_Fragment extends Fragment {
             }
         });
 
-
+        */
 
     }
 
@@ -108,7 +112,7 @@ public class Settings_Fragment extends Fragment {
         controller.setEmail(emailEditText.getText().toString());
         controller.setUsername(nameEditText.getText().toString());
 
-        controller.saveUserInfoDataBase();
+
 
     }
 
