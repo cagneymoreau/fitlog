@@ -1,4 +1,4 @@
-<img align="left" src="https://imgur.com/a/bTmhoDJ">
+<img align="center" src="https://imgur.com/a/bTmhoDJ">
 
 Fitness Journal App
 
