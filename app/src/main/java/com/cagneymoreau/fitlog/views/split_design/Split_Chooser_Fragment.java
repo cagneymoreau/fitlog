@@ -43,7 +43,9 @@ public class Split_Chooser_Fragment extends MyFragment {
 
     List<String> splitsList;
 
-    ArrayList<Splits> toDelete;
+
+
+    boolean saved;
     
     @Nullable
     @Override
@@ -62,6 +64,8 @@ public class Split_Chooser_Fragment extends MyFragment {
         
         buildRecycleView();
 
+        saved = false;
+
         return fragView;
     }
     
@@ -69,7 +73,7 @@ public class Split_Chooser_Fragment extends MyFragment {
     
     private void buildRecycleView()
     {
-        toDelete = new ArrayList<>();
+
 
         //Here we expect list of all splits ordered from most recently used or created to oldest
         //last on list should be a create new button//limit is 25 splits
@@ -84,7 +88,7 @@ public class Split_Chooser_Fragment extends MyFragment {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position, float x, float y) {
-
+                //open edit
                 controller.setSplitToModify(position);
                 Navigation.findNavController(fragView).navigate(R.id.action_split_Chooser_Fragment_to_split_Edit_Fragment);
 
@@ -93,8 +97,9 @@ public class Split_Chooser_Fragment extends MyFragment {
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-                List<String> sp = controller.selectSplit(position);
-                split_adapter.insertList(sp);
+                //make active
+                splitsList = controller.selectSplit(position);
+                split_adapter.insertList(splitsList);
                 split_adapter.notifyDataSetChanged();
 
             }
@@ -122,10 +127,11 @@ public class Split_Chooser_Fragment extends MyFragment {
 
                 }else {
 
-                    final String s = splitsList.get(position);
                     final Splits split = controller.getSpecificSplit(position);
-                    splitsList.remove(position);
-                    toDelete.add(split);
+                    controller.deleteSplits(split);
+                    splitsList = controller.getSplitsList();
+                    split_adapter.insertList(splitsList);
+                    split_adapter.notifyDataSetChanged();
 
                     Snackbar snackbar = Snackbar
                             .make(fragView, "Item was removed from the list.", Snackbar.LENGTH_LONG);
@@ -133,9 +139,9 @@ public class Split_Chooser_Fragment extends MyFragment {
                         @Override
                         public void onClick(View view) {
 
-                            splitsList.add(position, s);
-                            toDelete.remove(split);
-                            recyclerView.scrollToPosition(position);
+                            controller.restoreSplit(split);
+                            splitsList = controller.getSplitsList();
+                            split_adapter.insertList(splitsList);
                             split_adapter.notifyDataSetChanged();
                         }
                     });
@@ -143,7 +149,7 @@ public class Split_Chooser_Fragment extends MyFragment {
                     snackbar.setActionTextColor(Color.YELLOW);
                     snackbar.show();
                 }
-                split_adapter.notifyDataSetChanged();
+
             }
         };
 
@@ -152,10 +158,28 @@ public class Split_Chooser_Fragment extends MyFragment {
     }
 
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        save();
 
-        controller.updateSplitsInDB();
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        save();
+    }
+
+    private void save()
+    {
+        if (saved) return;
+        controller.updateSplitsInDB();
+
+        saved = true;
+
+    }
+
+
 }

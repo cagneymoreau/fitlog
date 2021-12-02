@@ -52,6 +52,8 @@ public class Workout_Holder_Fragment extends Fragment {
 
     int currUID = -1;
 
+    boolean saved;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -175,29 +177,40 @@ public class Workout_Holder_Fragment extends Fragment {
 
         buildInitialUI();
 
+        saved = false;
+
     }
 
 
-    // TODO: 11/9/2021 there seems to be some type of buildup of fragments that are bing called in series into sql
-    private void destroyFragments()
+
+    private void saveAll()
     {
-        active_workout_.onDestroy();
-        history_viewer.onDestroy();
-        timerActions.onDestroy();
-        checkListViewer.onDestroy();
+        if(saved) return;
+
+        active_workout_.saveAll();
+        checkListViewer.saveAll();
 
         controller.saveWorkoutToDB();
+
+        saved = true;
 
     }
 
 
     @Override
     public void onDestroyView() {
+
         super.onDestroyView();
-        Log.e(TAG, "onDestroyView: ----------------------------------------");
 
-        destroyFragments();
+        saveAll();
 
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveAll();
     }
 
     public int getCurrUID()

@@ -2,5 +2,4 @@
 
 Fitness Journal App
 
-To Do:
-Needs user testing and debugging but launches and works fairly well
+Tracks workouts and creates spreadsheets

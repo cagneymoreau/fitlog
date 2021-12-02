@@ -49,12 +49,11 @@ public class Split_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (data.size() > 1 && position == 0){
             split_viewHolder.getImageView().setImageResource(R.drawable.green_select);
             split_viewHolder.getImageView().setMaxHeight(100);
-        }
-
-
-        if (v.equals(" Create New Split")){
+        }else if (position == data.size()-1){
             split_viewHolder.getImageView().setImageResource(R.drawable.gold_arrow);
             split_viewHolder.getImageView().setMaxHeight(100);
+        }else{
+            split_viewHolder.getImageView().setImageDrawable(null);
         }
 
 

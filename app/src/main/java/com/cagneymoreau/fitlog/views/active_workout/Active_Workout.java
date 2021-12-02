@@ -33,8 +33,6 @@ import java.util.ArrayList;
  *
  */
 
-    // TODO: 6/15/2021 deletes the data on next
-    // TODO: 6/15/2021 doesnt hide keyboard on next
 
 
 public class Active_Workout extends MyFragment {
@@ -52,7 +50,7 @@ public class Active_Workout extends MyFragment {
     Active_Workout_Adapter active_workout_adapter;
     RecyclerView.LayoutManager layoutManager;
 
-    TextView titleTv, bottomTv;
+    TextView titleTv, bottomTv, timeTextView;
     ArrayList<String> title;
 
     boolean constructed = false;
@@ -68,7 +66,7 @@ public class Active_Workout extends MyFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        fragView = inflater.inflate(R.layout.chooser, container, false);
+        fragView = inflater.inflate(R.layout.act_wk_chooser, container, false);
 
         MainActivity mainActivity = (MainActivity) getActivity();
 
@@ -89,6 +87,10 @@ public class Active_Workout extends MyFragment {
         bottomTv = fragView.findViewById(R.id.chooser_textView);
         bottomTv.setText("Enter your workout data");
 
+        timeTextView = fragView.findViewById(R.id.active_dateTime_Tv);
+
+        timeTextView.setText(controller.getTimeDateDesc());
+
         buildRecycleView();
 
         return fragView;
@@ -104,18 +106,15 @@ public class Active_Workout extends MyFragment {
 
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void saveAll()
+    {
 
         pullEdits();
-      if (constructed) deconstruct();
-        // TODO: 11/9/2021 update checlist
+        if (constructed) deconstruct();
 
         controller.updatecurrentWorkout(currentWorkout);
-
     }
+
 
     private void buildRecycleView()
     {
@@ -213,7 +212,7 @@ public class Active_Workout extends MyFragment {
 
     public void changeMoveName(int pos)
     {   toEdit = pos;
-        new Description_Dialog("Rename Movement?", currentWorkout.get(pos).get(0), parent, false).show(getChildFragmentManager(), " Edit title Dialog");
+        new Description_Dialog("Rename Movement?", currentWorkout.get(pos).get(0), parent, true).show(getChildFragmentManager(), " Edit title Dialog");
 
     }
 
@@ -243,6 +242,8 @@ public class Active_Workout extends MyFragment {
         active_workout_adapter.notifyDataSetChanged();
 
     }
+
+
 
 
 }

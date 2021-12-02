@@ -105,6 +105,8 @@ public class CheckList_Viewer extends Fragment {
         String notes = controller.getNotes();
         if (notes != null){
             notesEditText.setText(notes);
+        }else {
+            notesEditText.setHint("Add notes here");
         }
 
 
@@ -112,11 +114,13 @@ public class CheckList_Viewer extends Fragment {
     }
 
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+
+
+    public void saveAll()
+    {
         if (checklistinputs != null && notesEditText != null) {
             controller.updateCheckListInWorkout((ArrayList<Pair<String, Boolean>>) checklistinputs, notesEditText.getText().toString());
         }
     }
+
 }

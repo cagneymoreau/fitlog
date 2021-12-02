@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
 
     <EditText
         android:id="@+id/backup_EditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
+        android:id="@+id/button_Linear"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backup_EditText">
 
         <Button
             android:id="@+id/policy_Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
         <Button
             android:id="@+id/privacy_Button"
             android:layout_width="wrap_content"
@@ -25,26 +32,41 @@
 
     </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/backup_TextView"
-        android:text="data policy"
+    <ScrollView
+        android:id="@+id/scrollText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="200dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_Linear">
+
+        <TextView
+            android:id="@+id/backup_TextView"
+            android:text="data policy"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"/>
+
+
+    </ScrollView>
+
 
 
     <Button
         android:id="@+id/create_backup_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollText"/>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/backup_recycleView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/create_backup_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

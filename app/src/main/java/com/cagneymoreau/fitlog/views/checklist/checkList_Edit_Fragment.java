@@ -225,9 +225,5 @@ public class checkList_Edit_Fragment extends MyFragment {
     }
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        save();
-    }
+
 }

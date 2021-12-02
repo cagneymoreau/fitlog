@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -123,7 +124,8 @@ public class History_Periods extends MyFragment {
 
                     }else{
                         LocalDate d = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDate();
-                        DatePickerDialog pick = new DatePickerDialog(fragView.getContext(), dateSetListener,d.getYear(), d.getMonth().getValue(), d.getDayOfMonth());
+
+                        DatePickerDialog pick = new DatePickerDialog(fragView.getContext(), dateSetListener, d.getYear(), d.getMonth().getValue()-1, d.getDayOfMonth());
                         pick.show();
                     }
 
@@ -159,9 +161,17 @@ public class History_Periods extends MyFragment {
                 @Override
                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-                    Instant instant = LocalDate.of(year,month,dayOfMonth).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+                    Instant instant = LocalDate.of(year,month + 1,dayOfMonth).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
                     long milli = instant.toEpochMilli();
+
+                    long maxBack = 60L/*days*/ * 24L* 60L *60L *1000L;
+
+                    if ((System.currentTimeMillis() - milli) > maxBack){
+
+                        Toast.makeText(getContext(), "Max backdate is 60 days", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
                     Bundle b = new Bundle();
                     b.putLong("time",milli);

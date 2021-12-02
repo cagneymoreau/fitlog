@@ -1,5 +1,6 @@
 package com.cagneymoreau.fitlog.views.setting_utility;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,21 +11,26 @@ import android.os.Bundle;
 import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.util.FileUtil;
 
 import com.cagneymoreau.fitlog.MainActivity;
 import com.cagneymoreau.fitlog.R;
@@ -40,9 +46,13 @@ import com.cagneymoreau.fitlog.logic.RecyclerTouchListener;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -60,7 +70,7 @@ import static android.app.Activity.RESULT_OK;
  * recycleview with
  *  create new backup <-- this will create backup up all that aren't backed up, unless some specific month is chosen
  *  show recent backups... <-- each of these can be mannualy selected to be backed up and show a backed vs non backeded up warning
- * // TODO: 6/8/2021 if old backup is pressed try resend
+ * // TODO: 11/26/2021 load old damage make sure it works 
  *
  */
 
@@ -83,21 +93,22 @@ public class DataBackup extends MyFragment {
 
     ArrayList<Pair<String, Boolean>> humanReadable;
 
+    ScrollView scrollView;
+
     int freeCount;
 
-    private static final int REQUEST_CODE = 103;
 
     String policy ="POLICY - This is not a permanent data backup app." +
             " Old data is automatically deleted after 12 months to save space." +
             " Make sure to send regular backups to your email for long term storage." +
-            "I recommend monthly data backups to prevent large losses." +
-            "Perform a workout and make a backup to ensure that the backups meet your requirements." +
-            "This app should auto-backup to your google drive if you get a new phone but please double check when switching device" +
+            " I recommend monthly data backups to prevent large losses." +
+            " Perform a workout and make a backup to ensure that the backups meet your requirements." +
+            " This app should auto-backup to your google drive if you get a new phone but please double check when switching device. " +
             "If you get an error making a data backup contact me and forward the generated email to tau6283@protonmail.com";
 
     String privacy = "PRIVACY - Your data is not private. If this app crashes the data related to that crash is sent to the app designer to fix the bug." +
             "There is no method to opt out. By using this app you consent to that usage. I have no intention of using your data other than making sure the app works." +
-            " Further governments and Non Government Organizations purposely embed tracking software and hardware everywhere which I cannot control." +
+            " Further, governments and non government organizations purposely embed tracking software and hardware everywhere which I cannot control." +
             "Never publish private information in this app (or any app for that matter).";
 
 
@@ -111,6 +122,8 @@ public class DataBackup extends MyFragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         controller = mainActivity.getConroller();
+
+        scrollView = fragView.findViewById(R.id.scrollText);
 
         backup_btn = fragView.findViewById(R.id.create_backup_button);
         policyButton = fragView.findViewById(R.id.policy_Button);
@@ -152,6 +165,7 @@ public class DataBackup extends MyFragment {
             @Override
             public void onClick(View v) {
                 textViewExplain.setText(policy);
+                scrollView.scrollTo(0,0);
             }
         });
 
@@ -160,8 +174,31 @@ public class DataBackup extends MyFragment {
             @Override
             public void onClick(View v) {
                 textViewExplain.setText(privacy);
+                scrollView.scrollTo(0,0);
             }
         });
+
+
+        if (controller.getEmail().equals("cagneyamoreau@gmail.com"))
+        {
+
+        }
+
+
+        privacyButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                if (controller.getEmail().equals("cagneyamoreau@gmail.com"))
+                {
+                    examineFile();
+                }
+
+                return false;
+            }
+        });
+
+
 
     }
 
@@ -176,20 +213,9 @@ public class DataBackup extends MyFragment {
              editTextEmail.setText(s);
          }
 
-         if (s.equals("cagneyamoreau@gmail.com"))
-         {
-             editTextEmail.setOnLongClickListener(new View.OnLongClickListener() {
-                 @Override
-                 public boolean onLongClick(View v) {
-
-                     examineFile();
-
-                     return false;
-                 }
-             });
-         }
 
     }
+
 
 
     private void buildRecycleView()
@@ -353,17 +379,9 @@ public class DataBackup extends MyFragment {
 
     //region---------------Debugging a non local workout record. Not used by end users
 
-    private void examineFile()
-    {
+    private static final int REQUEST_CODE = 103;
 
-        showFileChooser();
-
-
-
-    }
-
-
-    public void showFileChooser() {
+    public void examineFile() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 
         // Update with mime types
@@ -383,7 +401,6 @@ public class DataBackup extends MyFragment {
 
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // If the user doesn't pick a file just return
@@ -392,66 +409,22 @@ public class DataBackup extends MyFragment {
         }
 
         try {
-            Uri uri = data.getData();
-            File f = new File(uri.getPath());
-            ErrorLog log = ErrorLog.revertToObject(f);
+            ErrorLog l = ErrorLog.revertFromUri(data.getData(), getActivity());
+            l.description();
+
             BackupFileGenerator bfg = new BackupFileGenerator(controller, getContext());
-            bfg.debugRemoteData(log);
-        }catch (Exception e){
-            e.printStackTrace();
-            Toast.makeText(getContext(), " failed", Toast.LENGTH_SHORT).show();
+            bfg.debugRemoteData(l);
+
+        }catch (Exception e)
+        {
+            Log.e(TAG, "tryAgain: ", e);
         }
 
-        // Import the file
-       // importFile(data.getData());
-    }
-/*
-    public void importFile(Uri uri)
-    {
-        String fileName = getFileName(uri);
-
-        // The temp file could be whatever you want
-
-        File fileCopy = copyToTempFile(uri, BackupFileGenerator.getFilePath("input", ".txt", getContext()));
-
-        // Done!
-    }
-
-    private String getFileName(Uri uri) throws IllegalArgumentException {
-        // Obtain a cursor with information regarding this uri
-        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-
-        if (cursor.getCount() <= 0) {
-            cursor.close();
-            throw new IllegalArgumentException("Can't obtain file name, cursor is empty");
-        }
-
-        cursor.moveToFirst();
-
-        String fileName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
-
-        cursor.close();
-
-        return fileName;
     }
 
 
-    private File copyToTempFile(Uri uri, File tempFile) throws IOException {
-        // Obtain an input stream from the uri
-        InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
-
-        if (inputStream == null) {
-            throw new IOException("Unable to obtain input stream from URI");
-        }
-
-        // Copy the stream to the temp file
-        FileUtils.copy(inputStream, new FileDescriptor());
-
-        return tempFile;
-    }
 
 
- */
     //endregion
 
 

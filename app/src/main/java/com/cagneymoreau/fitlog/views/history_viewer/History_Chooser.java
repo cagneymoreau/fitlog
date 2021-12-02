@@ -28,6 +28,8 @@ import com.cagneymoreau.fitlog.views.history_viewer.recycleview.History_Adapter;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Remember this is not a long term storage app
@@ -59,6 +61,7 @@ public class History_Chooser extends MyFragment {
 
     ArrayList<HistoryItem> toDelete;
 
+    boolean saved;
 
     @Nullable
     @Override
@@ -81,6 +84,8 @@ public class History_Chooser extends MyFragment {
         }
 
         controller.getRecentList(this, period);
+
+        saved = false;
 
         return fragView;
 
@@ -199,7 +204,6 @@ public class History_Chooser extends MyFragment {
 
                 toDelete.add(item);
 
-
                 Snackbar snackbar = Snackbar
                         .make(fragView, "Item was removed from the list.", Snackbar.LENGTH_LONG);
                 snackbar.setAction("UNDO", new View.OnClickListener() {
@@ -209,6 +213,7 @@ public class History_Chooser extends MyFragment {
                         toDelete.remove(item);
                         recHistory_adapter.restoreItem(item, position);
                         recRecyclerView.scrollToPosition(position);
+
                     }
                 });
 
@@ -223,17 +228,31 @@ public class History_Chooser extends MyFragment {
     }
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
 
+
+
+    private void saveAll()
+    {
+        if (saved) return;
         for (HistoryItem i :
                 toDelete) {
 
             controller.deleteWorkoutRecord(i.uid);
 
         }
+        saved = true;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        saveAll();
     }
 
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveAll();
+    }
 }

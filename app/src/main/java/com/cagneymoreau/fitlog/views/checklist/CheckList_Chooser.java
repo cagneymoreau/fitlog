@@ -42,8 +42,10 @@ public class CheckList_Chooser extends MyFragment {
     CheckList_Adapter checkList_adapter;
     RecyclerView.LayoutManager layoutManager;
 
-    ArrayList<CheckLists> toDelete;
+
     Pair<List<String>, Boolean> data;
+
+    boolean saved;
 
     @Nullable
     @Override
@@ -60,6 +62,8 @@ public class CheckList_Chooser extends MyFragment {
 
         buildRecycleView();
 
+        saved = false;
+
         return fragView;
 
     }
@@ -68,8 +72,6 @@ public class CheckList_Chooser extends MyFragment {
 
     private void buildRecycleView()
     {
-        toDelete = new ArrayList<>();
-
 
         //Here we expect list of all checklists ordered from most recently used or created to oldest
         //last on list should be a create new button//limit is 25 checklists
@@ -96,9 +98,8 @@ public class CheckList_Chooser extends MyFragment {
             public void onLongClick(View view, int position, float x, float y) {
 
                 //make active
-                controller.selectCheckList(position);
-                Pair<List<String>, Boolean> dd = controller.getCheckListsChoice();
-                checkList_adapter.insertList(dd);
+                data = controller.selectCheckList(position);
+                checkList_adapter.insertList(data);
                 checkList_adapter.notifyDataSetChanged();
 
             }
@@ -126,10 +127,10 @@ public class CheckList_Chooser extends MyFragment {
                 }else {
 
                     final CheckLists check = controller.getspecificCheckList(position);
-                    //String item = checkList_adapter.removeItem(position);
-                    String item = data.first.remove(position);
-                    toDelete.add(check);
-
+                    controller.deleteChecklist(check);
+                    data = controller.getCheckListsChoice();
+                    checkList_adapter.insertList(data);
+                    checkList_adapter.notifyDataSetChanged();
 
                     Snackbar snackbar = Snackbar
                             .make(fragView, "Item was removed from the list.", Snackbar.LENGTH_LONG);
@@ -137,10 +138,12 @@ public class CheckList_Chooser extends MyFragment {
                         @Override
                         public void onClick(View view) {
 
-                            toDelete.remove(check);
-                            //checkList_adapter.restoreItem(item, position);
-                            data.first.add(position, item);
+                            controller.reverseDelete(check);
+                            data = controller.getCheckListsChoice();
+                            checkList_adapter.insertList(data);
+                            checkList_adapter.notifyDataSetChanged();
                             recyclerView.scrollToPosition(position);
+
                         }
                     });
 
@@ -148,8 +151,8 @@ public class CheckList_Chooser extends MyFragment {
                     snackbar.show();
                 }
 
-                save();
-                checkList_adapter.notifyDataSetChanged();
+
+
 
             }
         };
@@ -161,18 +164,22 @@ public class CheckList_Chooser extends MyFragment {
 
     private void save()
     {
-            for (CheckLists check :
-                    toDelete) {
-                controller.deleteChecklist(check);
-        }
+        if (saved) return;
+        controller.updateCheckListInDB();
+            saved = true;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        controller.updateCheckListInDB();
+        save();
+
     }
 
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        save();
+    }
 }

@@ -106,11 +106,11 @@ public class BackupFileGenerator {
             MonthTensor monthTensor = new MonthTensor(log.getRecords(), log.getPeriod());
             ArrayList<File> out = monthTensor.generateCSV();
         }catch (Exception e) {
+            e.printStackTrace();
             FirebaseCrashlytics.getInstance().log(TAG + " monthtensor");
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-
-
+        int i = 0;
     }
 
     public static File getFilePath(String name, String suffix, Context context)
@@ -120,7 +120,7 @@ public class BackupFileGenerator {
 
 
         //Log.i(TAG, "getFilePath: " + name + NAMEFORFILE);
-        String fileName = Uri.parse(name).getLastPathSegment();
+        String fileName = Uri.parse(name + " -").getLastPathSegment();
 
         try {
 
@@ -352,6 +352,7 @@ public class BackupFileGenerator {
         {
             ArrayList<StringBuilder> builder = new ArrayList<>();
 
+            //create stringbuilder and fill first column
             for (int i = 0; i < day.get(0).thisday.get(0).descriptionGrid.size(); i++) {
                 builder.add(new StringBuilder());
 
@@ -401,7 +402,7 @@ public class BackupFileGenerator {
                 if (day.get(i).thisday.size()-1 <= deep){
                    data = day.get(i).thisday.get(0).descriptionGrid;
                 }else {
-                   data = day.get(i).thisday.get(deep-1).descriptionGrid;
+                   data = day.get(i).thisday.get(deep).descriptionGrid;
                 }
 
 

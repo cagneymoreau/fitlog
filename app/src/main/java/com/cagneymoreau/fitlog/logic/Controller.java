@@ -552,7 +552,7 @@ public class Controller {
     //Any time a checklist is worked on just update the heap list
     //This method needs the title as entry position 0
     //it will automatically select as active, record new last used time
-
+    // TODO: 11/29/2021 when new checklist is created we use position in list to edit but the list order changes and we start editing wrong
     public void updateSpecificCheckListEdit(ArrayList<String> update, int position)
     {
         boolean newDBItem = false;
@@ -593,6 +593,12 @@ public class Controller {
         checkListsToDelete.add(checkLists);
 
         checkListsList.remove(checkLists);
+    }
+
+    public void reverseDelete(CheckLists c)
+    {
+        checkListsToDelete.remove(c);
+        checkListsList.add(c);
     }
 
 
@@ -815,21 +821,17 @@ public class Controller {
         return splitsList.get(pos);
     }
 
-    public void deleteSplits(ArrayList<Splits> splitDel)
+    public void deleteSplits(Splits s)
     {
-        new Thread(() -> {
-
-            for (Splits s :
-                splitDel) {
-                splitsList.remove(s);
-                splitsDao.delete(s);
-        }
-
-        }).start();
-
+         splitsList.remove(s);
+         splitsToDelete.add(s);
     }
 
-
+    public void restoreSplit(Splits s)
+    {
+        splitsList.add(s);
+        splitsToDelete.remove(s);
+    }
 
     //endregion
 
@@ -843,6 +845,8 @@ public class Controller {
     int daySelection = -1;
 
     WorkoutRecord workoutRecord;
+
+    ArrayList<Integer> toDelete = new ArrayList<>();
 
 
     public String getCurrentDayName()
@@ -858,6 +862,13 @@ public class Controller {
     public int getCurrentUID()
     {
         return workoutRecord.uid;
+    }
+
+    public String getTimeDateDesc()
+    {
+        LocalDateTime date = Instant.ofEpochMilli(workoutRecord.datetime).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        return date.toString();
     }
 
     public void getRecentWorkoutDesc(MyFragment myFragment)
@@ -1064,8 +1075,6 @@ public class Controller {
         workoutRecord.checkList = savable;
 
         workoutRecord.workout = workouts;
-
-        
 
 
     }

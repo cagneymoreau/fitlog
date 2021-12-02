@@ -1,7 +1,9 @@
 package com.cagneymoreau.fitlog.data;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Pair;
 
 import com.cagneymoreau.fitlog.logic.BackupFileGenerator;
@@ -9,6 +11,7 @@ import com.cagneymoreau.fitlog.logic.BackupFileGenerator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -65,6 +68,8 @@ public class ErrorLog implements Serializable {
 
             for (int i = 0; i < check.size(); i++) {
 
+                records.get(i).checkList = new ArrayList<Pair<String, Boolean>>();
+
                 for (int j = 0; j < check.get(i).size(); j++) {
 
                     Pair<String, Boolean> pp = new Pair<>(check.get(i).get(j), marks.get(i).get(j));
@@ -108,6 +113,22 @@ public class ErrorLog implements Serializable {
         ErrorLog log = null;
 
         FileInputStream inputStream = new FileInputStream(f);
+        ObjectInputStream stream = new ObjectInputStream(inputStream);
+
+        log = (ErrorLog) stream.readObject();
+
+        stream.close();
+        inputStream.close();
+
+        return log;
+
+    }
+
+    public static ErrorLog revertFromUri(Uri uri, Activity activity)throws Exception
+    {
+        ErrorLog log = null;
+
+        InputStream inputStream = activity.getContentResolver().openInputStream(uri);
         ObjectInputStream stream = new ObjectInputStream(inputStream);
 
         log = (ErrorLog) stream.readObject();
